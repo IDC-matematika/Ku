@@ -400,6 +400,30 @@ img{max-width:100%;display:block;user-select:none;-webkit-user-drag:none}
 
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 .act{display:block}
+
+/* ---------- sound & motion ---------- */
+.ico{display:inline-block}
+.ib.tog[aria-pressed="true"]{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 40%,transparent);color:var(--accent)}
+.mascot{position:fixed;right:max(18px,env(safe-area-inset-right,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:30;pointer-events:none;display:flex;align-items:flex-end;gap:6px}
+.mascot .hog{width:78px;height:78px;transform-origin:50% 100%;animation:breathe 3.2s ease-in-out infinite;filter:drop-shadow(0 4px 6px rgba(0,0,0,.18))}
+.mascot .hog img{width:100%;height:100%;object-fit:contain;transform:scaleX(-1)}
+.mascot .bub{margin-bottom:46px;background:var(--surface);color:var(--fg);border:1px solid var(--hair);box-shadow:var(--shadow);border-radius:16px 16px 4px 16px;padding:7px 12px;font-family:var(--read);font-weight:700;font-size:.98rem;max-width:200px;opacity:0;transform:translateY(6px) scale(.9);transform-origin:100% 100%;transition:opacity .2s,transform .25s cubic-bezier(.2,1.6,.4,1)}
+.mascot .bub.show{opacity:1;transform:none}
+.mascot.hop .hog{animation:hop .55s cubic-bezier(.3,1.6,.5,1)}
+.mascot.nope .hog{animation:nope .5s ease-in-out}
+.mascot.win .hog{animation:winjump .9s cubic-bezier(.3,1.4,.5,1)}
+@keyframes breathe{50%{transform:scale(1.03,.97)}}
+@keyframes hop{30%{transform:translateY(-22px) scale(.95,1.06)}60%{transform:translateY(0) scale(1.08,.92)}}
+@keyframes nope{20%{transform:rotate(-9deg)}45%{transform:rotate(8deg)}70%{transform:rotate(-5deg)}}
+@keyframes winjump{25%{transform:translateY(-40px) rotate(-12deg) scale(1.1)}50%{transform:translateY(-40px) rotate(12deg) scale(1.1)}80%{transform:translateY(0) scale(1.1,.9)}}
+.spark{position:fixed;left:0;top:0;width:10px;height:10px;pointer-events:none;z-index:40;animation:spark .7s ease-out forwards}
+@keyframes spark{from{transform:translate(var(--x),var(--y)) scale(1) rotate(0deg)}to{transform:translate(calc(var(--x) + var(--dx)),calc(var(--y) + var(--dy))) scale(.2) rotate(180deg);opacity:0}}
+.flystar{position:fixed;left:-22px;top:-22px;width:44px;height:44px;color:var(--star);z-index:45;pointer-events:none;filter:drop-shadow(0 2px 4px rgba(0,0,0,.25))}
+.flystar svg{width:100%;height:100%;display:block}
+.bump{animation:bump .5s cubic-bezier(.3,1.8,.5,1)}
+@keyframes bump{40%{transform:scale(1.4)}}
+@media (max-width:860px){.mascot{bottom:calc(80px + env(safe-area-inset-bottom,0px));right:max(10px,env(safe-area-inset-right,0px))}.mascot .hog{width:56px;height:56px}.mascot .bub{margin-bottom:30px;font-size:.9rem}}
+@media (prefers-reduced-motion:reduce){.spark,.flystar{display:none}}
 </style>
 
 <div class="app">
@@ -428,6 +452,8 @@ img{max-width:100%;display:block;user-select:none;-webkit-user-drag:none}
       <div class="acts">
         <div class="grp">
           <button class="ib" id="soundBtn" type="button" aria-pressed="true"></button>
+          <button class="ib tog" id="musicBtn" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg></button>
+          <button class="ib" id="ttsBtn" type="button" aria-label="Topşiriqni öqib ber" title="Topşiriqni öqib ber" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4a4 4 0 0 0-4 4c0 3 3 4 3 7a3 3 0 0 0 5.5 1.6"/><path d="M15.5 9.5a2 2 0 0 0-3.5-1.3"/><path d="M19 4c1.5 1.6 2 3.4 2 5.5M17 6c.8.9 1.2 2 1.2 3.4"/></svg></button>
           <button class="ib" id="restart" type="button" aria-label="Betni qaytadan boşlaş" title="Qaytadan boşlaş"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></button>
         </div>
         <div class="grp pg">
@@ -449,6 +475,8 @@ img{max-width:100%;display:block;user-select:none;-webkit-user-drag:none}
     </div>
   </main>
 </div>
+
+<div class="mascot" id="mascot" aria-hidden="true"><div class="bub" id="bub"></div><div class="hog"><img src="img/145.webp" alt=""></div></div>
 
 <nav class="mbar" aria-label="Betlar böyiça yuriş">
   <button class="ib" id="mPrev" type="button" aria-label="Oldingi bet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
@@ -501,22 +529,81 @@ let doneSet = new Set(store.get('done', []));
 let moods = store.get('moods', {});
 let soundOn = store.get('sound', true);
 
-/* ---------- sound ---------- */
-let ac = null;
+/* ---------- sound: everything is synthesised in the browser, no audio files ---------- */
+let ac = null, master = null, sfxBus = null, musicBus = null, onTone = null;
+let musicOn = store.get('music', false);
+function audio() {
+  if (!ac) {
+    ac = new (window.AudioContext || window.webkitAudioContext)();
+    master = ac.createGain(); master.gain.value = soundOn ? 1 : 0; master.connect(ac.destination);
+    sfxBus = ac.createGain(); sfxBus.gain.value = .9; sfxBus.connect(master);
+    musicBus = ac.createGain(); musicBus.gain.value = 0; musicBus.connect(master);
+  }
+  if (ac.state === 'suspended') ac.resume();
+  return ac;
+}
+const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+/* a soft mallet note: sine body + a quickly fading overtone, like a toy xylophone */
+function mallet(f, t, dur = .5, vol = .2, bus = sfxBus) {
+  const g = ac.createGain(); g.connect(bus);
+  g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + .006); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+  const o = ac.createOscillator(); o.type = 'sine'; o.frequency.value = f; o.connect(g); o.start(t); o.stop(t + dur + .05);
+  const g2 = ac.createGain(); g2.connect(bus);
+  g2.gain.setValueAtTime(.0001, t); g2.gain.exponentialRampToValueAtTime(vol * .35, t + .004); g2.gain.exponentialRampToValueAtTime(.0001, t + dur * .25);
+  const o2 = ac.createOscillator(); o2.type = 'sine'; o2.frequency.value = f * 4; o2.connect(g2); o2.start(t); o2.stop(t + dur * .3);
+}
+function blip(f0, f1, t, dur, vol, type = 'sine') {
+  const g = ac.createGain(); g.connect(sfxBus);
+  g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + .008); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+  const o = ac.createOscillator(); o.type = type; o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f1, t + dur * .8);
+  o.connect(g); o.start(t); o.stop(t + dur + .05);
+}
+function sparkleSound(t, n = 5) { for (let i = 0; i < n; i++) mallet(mtof(96 + [0, 4, 7, 12, 16][i % 5]), t + i * .045, .25, .045); }
+function whoosh(t) {
+  const len = .32, buf = ac.createBuffer(1, ac.sampleRate * len, ac.sampleRate), d = buf.getChannelData(0);
+  for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length);
+  const src = ac.createBufferSource(); src.buffer = buf;
+  const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 1.2; bp.frequency.setValueAtTime(350, t); bp.frequency.exponentialRampToValueAtTime(2400, t + len);
+  const g = ac.createGain(); g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.12, t + .06); g.gain.exponentialRampToValueAtTime(.0001, t + len);
+  src.connect(bp).connect(g).connect(sfxBus); src.start(t);
+}
 function tone(kind) {
+  try { onTone && onTone(kind); } catch {}
   if (!soundOn) return;
   try {
-    ac = ac || new (window.AudioContext || window.webkitAudioContext)();
-    const seq = { tap: [[660, .06]], yes: [[660, .09], [880, .14]], no: [[220, .18]], win: [[523, .1], [659, .1], [784, .1], [1047, .25]] }[kind] || [];
-    let t = ac.currentTime;
-    for (const [f, d] of seq) {
-      const o = ac.createOscillator(), g = ac.createGain();
-      o.type = kind === 'no' ? 'triangle' : 'sine'; o.frequency.value = f;
-      g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.18, t + .01); g.gain.exponentialRampToValueAtTime(.0001, t + d);
-      o.connect(g).connect(ac.destination); o.start(t); o.stop(t + d + .02); t += d * .9;
+    audio(); const t = ac.currentTime + .01;
+    switch (kind) {
+      case 'tap': blip(620, 360, t, .09, .14); break;
+      case 'yes': mallet(mtof(79), t, .45, .22); mallet(mtof(84), t + .09, .6, .22); sparkleSound(t + .16, 3); break;
+      case 'no': blip(330, 300, t, .16, .11, 'triangle'); blip(262, 236, t + .17, .22, .11, 'triangle'); break;
+      case 'win': [72, 76, 79, 84, 88].forEach((m, i) => mallet(mtof(m), t + i * .09, .7, .2)); sparkleSound(t + .5, 8); break;
+      case 'star': blip(880, 1760, t, .22, .1); mallet(mtof(91), t + .16, .5, .16); break;
+      case 'page': whoosh(t); break;
+      case 'big': [60, 64, 67, 72, 76, 79, 84].forEach((m, i) => mallet(mtof(m), t + i * .11, .9, .2)); sparkleSound(t + .8, 10); break;
     }
   } catch {}
 }
+/* gentle music-box loop: I–vi–IV–V in C, pentatonic melody */
+const Music = (() => {
+  let on = false, timer = null, nextT = 0, step = 0, loop = 0;
+  const SP = 60 / 92 / 2;
+  const chords = [[48, 52, 55], [45, 48, 52], [41, 45, 48], [43, 47, 50]];
+  const mel = [72, -1, 76, -1, 79, 76, 74, -1, 76, -1, 81, -1, 79, -1, -1, -1, 74, -1, 76, 79, 81, -1, 79, -1, 76, 74, 72, -1, 74, -1, -1, -1];
+  const alt = [79, -1, 76, -1, 72, 74, 76, -1, 81, -1, 79, -1, 76, -1, -1, -1, 81, 79, 76, -1, 74, -1, 72, -1, 74, -1, 79, -1, 72, -1, -1, -1];
+  function play(i, t) {
+    const bar = i >> 3, pos = i & 7, ch = chords[bar];
+    if (pos === 0) { ch.forEach(m => mallet(mtof(m + 12), t, 1.8, .035, musicBus)); mallet(mtof(ch[0] - 12 + 12), t, 1.2, .07, musicBus); }
+    if (pos === 4) mallet(mtof(ch[0]), t, .9, .05, musicBus);
+    const m = (loop % 2 ? alt : mel)[i]; if (m > 0) mallet(mtof(m), t, .9, .06, musicBus);
+  }
+  function sched() { while (nextT < ac.currentTime + .25) { play(step, nextT); nextT += SP; step = (step + 1) % 32; if (!step) loop++; } }
+  return {
+    get on() { return on; },
+    start() { audio(); if (on) return; on = true; clearInterval(timer); musicBus.gain.cancelScheduledValues(ac.currentTime); musicBus.gain.setTargetAtTime(.55, ac.currentTime, .4); nextT = ac.currentTime + .1; step = 0; timer = setInterval(sched, 60); },
+    stop() { if (!on || !ac) { on = false; return; } on = false; musicBus.gain.setTargetAtTime(0, ac.currentTime, .15); const tm = timer; setTimeout(() => { if (!on) clearInterval(tm); }, 700); }
+  };
+})();
+document.addEventListener('visibilitychange', () => { if (!ac) return; if (document.hidden) ac.suspend(); else ac.resume(); });
 function shake(n) { n.classList.remove('shake'); void n.offsetWidth; n.classList.add('shake'); }
 function confetti() {
   const box = h('div', { class: 'confetti' });
@@ -1205,6 +1292,8 @@ function buildSide(p, api) {
 
 function go(i, fromHash) {
   leaveFns.forEach(f => f()); leaveFns = []; doneFns = [];
+  const prevCur = cur;
+  try { speechSynthesis.cancel(); } catch {}
   cur = Math.max(0, Math.min(PAGES.length - 1, i));
   const p = PAGES[cur], [, sk] = META[p.n];
   $('#pn').textContent = p.n;
@@ -1222,8 +1311,11 @@ function go(i, fromHash) {
     done() {
       if (winbar.classList.contains('show')) return;
       winbar.classList.add('show'); tone('win'); confetti();
-      if (!doneSet.has(p.n)) { doneSet.add(p.n); store.set('done', [...doneSet]); }
+      const fresh = !doneSet.has(p.n);
+      if (fresh) { doneSet.add(p.n); store.set('done', [...doneSet]); }
       paintNav(); doneFns.forEach(f => f());
+      react('win'); flyStar(lastPt);
+      if (fresh && doneSet.size === PAGES.length) setTimeout(() => { tone('big'); confetti(); setTimeout(confetti, 600); react('win', 'Hamma 21 ta yulduzça seniki!'); }, 1300);
       if (cur < PAGES.length - 1) { $('#nextP').classList.add('pulse'); $('#mNext').classList.add('pulse'); }
     },
     bonusDone() { const bx = api._bonusBox; if (bx && !bx.dataset.solved) { bx.dataset.solved = 1; bx.append(h('span', { class: 'chip good' }, 'Topding!')); tone('yes'); } },
@@ -1232,10 +1324,75 @@ function go(i, fromHash) {
   };
   buildSide(p, api);
   p.build(act, api);
+  if (booted) {
+    if (prevCur !== cur) tone('page');
+    if (!RM.matches && st_animate) { const dx = cur > prevCur ? 28 : cur < prevCur ? -28 : 0; stage.animate([{ opacity: 0, transform: `translateX(${dx}px)` }, { opacity: 1, transform: 'none' }], { duration: 300, easing: 'cubic-bezier(.2,.8,.2,1)' }); }
+  }
+  booted = true;
   paintNav();
   navItems[cur].scrollIntoView({ block: 'nearest', inline: 'center' });
   if (!fromHash) { try { history.replaceState(null, '', '#p' + p.n); } catch {} window.scrollTo({ top: 0 }); }
 }
+
+/* ---------- feedback: mascot, sparkles, flying star ---------- */
+const RM = matchMedia('(prefers-reduced-motion: reduce)');
+let lastPt = null, booted = false;
+document.addEventListener('pointerdown', e => { lastPt = [e.clientX, e.clientY]; }, true);
+document.addEventListener('pointermove', e => { if (e.buttons) lastPt = [e.clientX, e.clientY]; }, true);
+document.addEventListener('keydown', () => { lastPt = null; }, true);
+const mascot = $('#mascot'), bub = $('#bub'); let bubT = null, masT = null;
+const SAY = { yes: ['Zör!', 'Töğri!', 'Ofarin!', 'Barakalla!', 'Juda yaxşi!', 'Ana şunaqa!'], no: ['Yana bir urinib kör', 'Diqqat bilan qara', 'Hechqisi yöq, yana!', 'Öyla-çi...'], win: ['Yulduzça seniki!', 'Zör bölding!', 'Qoyil!'] };
+const pickOne = a => a[Math.floor(Math.random() * a.length)];
+function say(text, ms = 1600) { bub.textContent = text; bub.classList.add('show'); clearTimeout(bubT); bubT = setTimeout(() => bub.classList.remove('show'), ms); }
+function react(kind, text) {
+  mascot.classList.remove('hop', 'nope', 'win'); void mascot.offsetWidth;
+  mascot.classList.add(kind === 'yes' ? 'hop' : kind === 'no' ? 'nope' : 'win');
+  clearTimeout(masT); masT = setTimeout(() => mascot.classList.remove('hop', 'nope', 'win'), 1000);
+  say(text || pickOne(SAY[kind]), kind === 'win' ? 2400 : 1500);
+}
+function center() { const r = stage.getBoundingClientRect(); return [r.left + r.width / 2, Math.max(80, Math.min(r.top + r.height / 2, innerHeight / 2))]; }
+function sparkle(pt) {
+  if (RM.matches) return;
+  const [x, y] = pt || center(); const cols = ['#F2A81E', '#E5505A', '#2C9A57', '#6FB7E8', '#F28C28'];
+  for (let i = 0; i < 12; i++) {
+    const a = i / 12 * Math.PI * 2 + Math.random() * .4, d = 40 + Math.random() * 40;
+    const sp = h('i', { class: 'spark' });
+    sp.style.cssText = `--x:${x - 5}px;--y:${y - 5}px;--dx:${Math.cos(a) * d}px;--dy:${Math.sin(a) * d}px;background:${cols[i % cols.length]};border-radius:${i % 2 ? '50%' : '2px'}`;
+    document.body.append(sp); setTimeout(() => sp.remove(), 800);
+  }
+}
+function flyStar(from) {
+  let to = null;
+  for (const sel of ['#progIco', '#mIco']) { const el = $(sel), r = el.getBoundingClientRect(); if (r.width && r.bottom > 0 && r.top < innerHeight) { to = el; break; } }
+  to = to || $('#pn');
+  const land = () => { tone('star'); to.classList.remove('bump'); void to.offsetWidth; to.classList.add('bump'); };
+  if (RM.matches || !st_animate) { land(); return; }
+  const [x0, y0] = from || center(), r = to.getBoundingClientRect(), x1 = r.left + r.width / 2, y1 = r.top + r.height / 2;
+  const st = h('span', { class: 'flystar', html: STAR }); document.body.append(st);
+  const mx = (x0 + x1) / 2, my = Math.min(y0, y1) - 120;
+  const an = st.animate([
+    { transform: `translate(${x0}px,${y0}px) scale(.4) rotate(0deg)` },
+    { transform: `translate(${x0}px,${y0 - 40}px) scale(1.4) rotate(-40deg)`, offset: .25 },
+    { transform: `translate(${mx}px,${my}px) scale(1.1) rotate(120deg)`, offset: .6 },
+    { transform: `translate(${x1}px,${y1}px) scale(.6) rotate(300deg)` }], { duration: 1100, easing: 'cubic-bezier(.4,0,.2,1)' });
+  an.onfinish = () => { st.remove(); land(); };
+}
+const st_animate = typeof Element.prototype.animate === 'function';
+onTone = kind => { if (kind === 'yes') { sparkle(lastPt); react('yes'); } else if (kind === 'no') react('no'); };
+
+/* music toggle */
+const mb = $('#musicBtn');
+const paintMusic = () => { mb.setAttribute('aria-pressed', String(musicOn)); const l = musicOn ? 'Musiqani öçiriş' : 'Musiqani yoqiş'; mb.setAttribute('aria-label', l); mb.title = l; };
+mb.onclick = () => { musicOn = !musicOn; store.set('music', musicOn); musicOn ? Music.start() : Music.stop(); paintMusic(); };
+paintMusic();
+if (musicOn) document.addEventListener('pointerdown', () => { if (musicOn && !Music.on) Music.start(); }, { once: true });
+
+/* read the task aloud — only where the device has an Uzbek voice */
+const tb = $('#ttsBtn'); let uzVoice = null;
+function findVoice() { try { uzVoice = speechSynthesis.getVoices().find(v => /^uz/i.test(v.lang)) || null; } catch { uzVoice = null; } tb.hidden = !uzVoice; }
+if ('speechSynthesis' in window) { findVoice(); try { speechSynthesis.addEventListener('voiceschanged', findVoice); } catch {} }
+const toStd = t => t.replace(/Ö/g, 'O‘').replace(/ö/g, 'o‘').replace(/Ğ/g, 'G‘').replace(/ğ/g, 'g‘').replace(/Ç/g, 'Ch').replace(/ç/g, 'ch').replace(/Ş/g, 'Sh').replace(/ş/g, 'sh');
+tb.onclick = () => { try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(toStd(PAGES[cur].title)); u.voice = uzVoice; u.lang = uzVoice.lang; u.rate = .9; speechSynthesis.speak(u); say('Tingla...'); } catch {} };
 
 const prev = () => go(cur - 1), next = () => go(cur + 1);
 $('#prevP').onclick = prev; $('#mPrev').onclick = prev;
@@ -1248,7 +1405,7 @@ document.addEventListener('keydown', e => {
 
 const sb = $('#soundBtn');
 const paintSound = () => { sb.innerHTML = soundOn ? SPK_ON : SPK_OFF; sb.setAttribute('aria-pressed', String(soundOn)); sb.setAttribute('aria-label', soundOn ? 'Ovozni öçiriş' : 'Ovozni yoqiş'); sb.title = sb.getAttribute('aria-label'); };
-sb.onclick = () => { soundOn = !soundOn; store.set('sound', soundOn); paintSound(); tone('tap'); };
+sb.onclick = () => { soundOn = !soundOn; store.set('sound', soundOn); paintSound(); if (master) master.gain.setTargetAtTime(soundOn ? 1 : 0, ac.currentTime, .05); tone('tap'); };
 paintSound();
 
 // two-step reset, since the page cannot show confirm() dialogs
