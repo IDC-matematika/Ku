@@ -38,6 +38,12 @@ def wrap(fragment: str) -> str:
     m = re.search(r"</style>", fragment, re.I)
     head, body = (fragment[: m.end()], fragment[m.end():]) if m else ("", fragment)
     head = head.replace('<meta name="claude:viewport-fit-sides" content="cover">', "")
+    head = (
+        '<link rel="manifest" href="../manifest.webmanifest">\n'
+        '<meta name="theme-color" content="#E5505A">\n'
+        '<link rel="apple-touch-icon" href="../icons/icon-192.png">\n'
+        '<meta name="apple-mobile-web-app-capable" content="yes">\n' + head
+    )
     return (
         "<!doctype html>\n<html lang=\"uz\">\n<head>\n"
         '<meta charset="utf-8">\n'
@@ -57,9 +63,10 @@ def main() -> None:
         for page in sorted(src.glob("*.html")):
             (dst / page.name).write_text(wrap(page.read_text(encoding="utf-8")), encoding="utf-8")
             print(f"page  {name}/{page.name}")
-        if (src / "img").is_dir():
-            shutil.copytree(src / "img", dst / "img")
-            print(f"img   {name}/img ({len(list((dst / 'img').iterdir()))} files)")
+        for sub in ("img", "audio"):
+            if (src / sub).is_dir():
+                shutil.copytree(src / sub, dst / sub)
+                print(f"{sub:5} {name}/{sub} ({len(list((dst / sub).iterdir()))} files)")
 
     # Landing page and anything else in site/ is copied as-is.
     for item in (ROOT / "site").iterdir():

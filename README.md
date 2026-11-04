@@ -8,6 +8,12 @@ IDC Kids (3–4 yosh) ish daftari asosidagi interaktiv mashqlar va yechimlar.
 | --- | --- | --- |
 | 1. Boğ va mevalar | [boq-va-mevalar/](https://idc-matematika.github.io/Ku/boq-va-mevalar/) | [yechimlar](https://idc-matematika.github.io/Ku/boq-va-mevalar/yechimlar.html) |
 
+## Audio («Tinglang» tugmasi)
+
+Har bet uchun o'zbekcha ovozli yozuv qo'shish mumkin. Fayllarni `boq-va-mevalar/audio/` papkasiga
+`p8.mp3`, `p9.mp3`, … `p28.mp3` nomlari bilan qo'ying (bet raqami bo'yicha). Fayl bor betlarda
+sarlavhada «Tinglang» tugmasi o'zi paydo bo'ladi; fayl yo'q betlarda tugma ko'rinmaydi.
+
 ## Qanday ishlaydi
 
 - `boq-va-mevalar/` — bob sahifalari (Claude Artifact formatida) va rasmlar.
