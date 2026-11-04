@@ -1462,7 +1462,7 @@ function buildSide(p, api) {
   });
   parts.push(h('section', { class: 'panel', 'aria-label': 'Ota-onalar uçun' },
     h('h2', {}, 'Birga öynaymiz'), h('p', {}, p.tip.charAt(0).toUpperCase() + p.tip.slice(1)), mood,
-    h('a', { class: 'sol', href: solUrl(p.n), target: '_blank', rel: 'noopener', html: KEY + '<span>Bu betning yechimini kör</span>' })));
+    h('a', { class: 'sol', href: solUrl(p.n), html: KEY + '<span>Bu betning yechimini kör</span>' })));
   side.replaceChildren(...parts);
 }
 
