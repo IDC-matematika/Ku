@@ -2,90 +2,162 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Baloo+2:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&family=Unbounded:wght@500;700&display=swap">
 <style>
-/* Layout: a garden trail map on top (21 stepping stones = 21 pages), the hedgehog guide narrates,
-   and the solution plays step by step on a workbook sheet below. Single light look: art is on white paper. */
+/* Layout: answer-key app — floating page index on the left, solved worksheet in the centre (always on white paper),
+   step timeline on the right; collapses to one column with a bottom control bar on phones. */
 :root{
-  --paper:#FBF7EE;
-  --sheet:#FFFFFF;
-  --ink:#2E2723;
-  --muted:#76685E;
-  --coral:#E5505A;
-  --coral-deep:#B9363F;
-  --orange:#F2922E;
-  --leaf:#4F8A3C;
-  --leaf-deep:#2F5E25;
-  --soil:#E9D3B4;
-  --cream:#FFF2E0;
-  --line:#EDDDCB;
-  --ok:#2C9A57;
-  --ok-soft:#E2F4E8;
-  --display:'Baloo 2','Trebuchet MS',system-ui,sans-serif;
-  --body:'Andika','Segoe UI',system-ui,sans-serif;
+  --bg:#F3F2ED;
+  --surface:#FFFFFF;
+  --surface-2:#ECEBE4;
+  --fg:#1D2220;
+  --muted:#626964;
+  --hair:#E1DFD6;
+  --accent:#E5505A;
+  --accent-fg:#FFFFFF;
+  --accent-soft:#FCE7E8;
+  --good:#2C7D4E;
+  --good-soft:#E2F1E7;
+  --ring:#F2922E;
+  --shadow:0 1px 2px rgba(30,34,32,.06),0 8px 24px -12px rgba(30,34,32,.18);
+  --ui:'Onest',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --head:'Unbounded','Onest',system-ui,sans-serif;
   color-scheme:light;
 }
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#111413;--surface:#1A1E1C;--surface-2:#232826;--fg:#E8ECE9;--muted:#9AA39E;--hair:#2C322F;
+  --accent:#FF6C75;--accent-fg:#1B0B0D;--accent-soft:#3A2326;--good:#71CC93;--good-soft:#1C3125;--ring:#F5A452;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.6);color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111413;--surface:#1A1E1C;--surface-2:#232826;--fg:#E8ECE9;--muted:#9AA39E;--hair:#2C322F;
+  --accent:#FF6C75;--accent-fg:#1B0B0D;--accent-soft:#3A2326;--good:#71CC93;--good-soft:#1C3125;--ring:#F5A452;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.6);color-scheme:dark}
 *{box-sizing:border-box}
-html,body{background:var(--paper);color:var(--ink)}
-body{font-family:var(--body);font-size:17px;line-height:1.45;-webkit-tap-highlight-color:transparent}
-body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--leaf-deep)}
-button{font:inherit;color:inherit}
+html,body{background:var(--bg);color:var(--fg)}
+body{font-family:var(--ui);font-size:16px;line-height:1.5;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;cursor:pointer}
 img{max-width:100%;display:block;user-select:none;-webkit-user-drag:none}
-:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
-.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-.in{max-width:1060px;margin:0 auto}
+:focus-visible{outline:3px solid var(--ring);outline-offset:2px}
 
-/* hero: garden trail */
-.hero{background:linear-gradient(#3F7A33,#4F8A3C 70%,#5C9A47);color:#fff;padding-block:14px 8px;position:relative;overflow:hidden}
-.hero::after{content:"";position:absolute;inset:auto 0 0;height:18px;background:radial-gradient(circle at 12px 18px,var(--paper) 12px,transparent 13px) 0 0/24px 18px repeat-x}
-.hero .top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.kicker{font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;opacity:.85}
-.hero h1{font-family:var(--display);font-weight:800;font-size:clamp(1.6rem,4vw,2.4rem);line-height:1.05;margin:2px 0 0;text-wrap:balance}
-.hero h1 em{font-style:normal;color:#FFD866}
-.legend{font-size:.9rem;opacity:.9;max-width:42ch}
-.trail{overflow-x:auto;margin-top:6px;padding-bottom:16px;scrollbar-width:thin}
-.trail svg{display:block;min-width:820px;width:100%;height:auto}
-.stone{cursor:pointer}
-.stone circle.base{fill:#F7EBD6;stroke:#C9A67A;stroke-width:3;transition:fill .25s}
-.stone text{font-family:var(--display);font-weight:800;font-size:19px;fill:#6B4E2E;text-anchor:middle;dominant-baseline:central;pointer-events:none}
-.stone.seen circle.base{fill:#FFE4A8}
-.stone.cur circle.base{fill:var(--coral);stroke:#fff}
-.stone.cur text{fill:#fff}
-.stone:hover circle.base{stroke:#fff}
-.stone:focus-visible{outline:none}
-.stone:focus-visible circle.base{stroke:#FFD866;stroke-width:5}
-#guide{transition:transform .7s cubic-bezier(.5,0,.3,1)}
+.app{display:grid;grid-template-columns:270px minmax(0,1fr);gap:16px;max-width:1500px;margin:0 auto;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 32px}
 
-main{padding-block:16px 40px}
-.sheet{background:var(--sheet);border-radius:22px;box-shadow:0 1px 0 var(--line),0 12px 30px -18px rgba(60,80,30,.35);padding:18px clamp(14px,3vw,28px) 22px}
-.head{display:flex;gap:14px;align-items:flex-start}
-.pnum{flex:0 0 auto;width:52px;height:52px;border-radius:50%;background:var(--coral);color:#fff;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:1.5rem;box-shadow:0 0 0 5px #fff,0 0 0 7px var(--cream)}
-.head .t{flex:1;min-width:0}
-.head h2{font-family:var(--display);font-weight:700;font-size:clamp(1.1rem,2.3vw,1.4rem);line-height:1.25;margin:0;text-wrap:balance}
-.answer{display:inline-flex;align-items:center;gap:6px;margin-top:6px;background:var(--ok-soft);color:#1E6B3D;border-radius:999px;padding:3px 12px;font-weight:700;font-size:.95rem}
-.answer[hidden]{display:none!important}
-.answer b{font-family:var(--display);letter-spacing:.06em;text-transform:uppercase;font-size:.78rem}
+/* index */
+.nav{position:sticky;top:calc(16px + env(safe-area-inset-top,0px));align-self:start;max-height:calc(100dvh - 32px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));
+  display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--hair);border-radius:20px;box-shadow:var(--shadow);overflow:hidden}
+.brand{display:flex;gap:12px;align-items:center;padding:16px 16px 10px}
+.logo{width:44px;height:44px;border-radius:14px;background:var(--accent);color:var(--accent-fg);display:grid;place-items:center;font-family:var(--head);font-weight:700;font-size:1.2rem;flex:0 0 auto}
+.eyebrow{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.bt{font-family:var(--head);font-weight:700;font-size:1.05rem;line-height:1.2}
+.filters{display:flex;flex-wrap:wrap;gap:6px;padding:4px 16px 12px;border-bottom:1px solid var(--hair)}
+.fc{border:1px solid var(--hair);background:transparent;border-radius:999px;padding:3px 10px;font-size:.8rem;font-weight:600;color:var(--muted);display:inline-flex;align-items:center;gap:6px}
+.fc i{width:8px;height:8px;border-radius:50%;background:var(--c,var(--muted))}
+.fc[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.navlist{list-style:none;margin:0;padding:8px;overflow:auto;flex:1}
+.ni{width:100%;display:grid;grid-template-columns:34px minmax(0,1fr) 18px;gap:10px;align-items:center;text-align:left;border:0;background:transparent;border-radius:12px;padding:7px 8px}
+.ni:hover{background:var(--surface-2)}
+.ni[aria-current="true"]{background:var(--accent-soft)}
+.ni .n{font-family:var(--head);font-weight:700;font-size:.85rem;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--surface-2);font-variant-numeric:tabular-nums}
+.ni[aria-current="true"] .n{background:var(--accent);color:var(--accent-fg)}
+.ni .nt{font-weight:600;font-size:.92rem;line-height:1.2;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ni .ns{font-size:.75rem;color:var(--muted);display:flex;align-items:center;gap:5px}
+.ni .ns i{width:7px;height:7px;border-radius:50%;background:var(--c)}
+.ni .seen{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;color:var(--good);opacity:0}
+.ni.v .seen{opacity:1}
+.ni[hidden]{display:none}
 
-/* narrator */
-.narr{display:grid;grid-template-columns:76px minmax(0,1fr);gap:12px;align-items:center;margin-top:16px}
-.narr img{width:76px;transform:scaleX(-1)}
-.bubble{background:#FFF8E1;border:2px solid #EFCF6E;border-radius:18px;padding:10px 14px;position:relative;min-height:62px;display:flex;flex-direction:column;justify-content:center}
-.bubble::before{content:"";position:absolute;left:-11px;top:50%;margin-top:-9px;border:9px solid transparent;border-right:11px solid #EFCF6E;border-left:0}
-.bubble::after{content:"";position:absolute;left:-8px;top:50%;margin-top:-7px;border:7px solid transparent;border-right:9px solid #FFF8E1;border-left:0}
-.bubble .cnt{font-size:.78rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-.bubble .say{font-weight:700;font-size:1.05rem}
-.bubble .say.flash{animation:pop .4s}
-.ctrl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
-.btn{border:0;border-radius:999px;padding:9px 18px;font-family:var(--display);font-weight:700;font-size:1.02rem;cursor:pointer;background:var(--cream);color:var(--coral-deep);display:inline-flex;align-items:center;gap:8px}
-.btn.primary{background:var(--coral);color:#fff;min-width:150px;justify-content:center}
-.btn:disabled{opacity:.4;cursor:default}
-.btn svg{width:18px;height:18px}
-.pips{display:flex;gap:5px;margin-left:auto;flex-wrap:wrap}
-.pips i{width:10px;height:10px;border-radius:50%;background:var(--line)}
-.pips i.on{background:var(--orange)}
-.stage{margin-top:18px}
+/* main */
+.main{min-width:0;display:flex;flex-direction:column;gap:14px}
+.ph{display:flex;gap:16px;align-items:center;background:var(--surface);border:1px solid var(--hair);border-radius:20px;padding:14px 16px;box-shadow:var(--shadow)}
+.pn{flex:0 0 auto;width:60px;height:60px;border-radius:18px;background:var(--accent);color:var(--accent-fg);display:grid;place-items:center;font-family:var(--head);font-weight:700;font-size:1.6rem;font-variant-numeric:tabular-nums}
+.pt{flex:1;min-width:0}
+.meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:.8rem;color:var(--muted);font-weight:600}
+.skill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:2px 10px;background:color-mix(in srgb,var(--c) 15%,transparent);color:var(--fg)}
+.skill i{width:8px;height:8px;border-radius:50%;background:var(--c)}
+.diff{display:inline-flex;gap:1px;color:var(--ring)}
+.diff svg{width:15px;height:15px}
+.ph h1{margin:4px 0 0;font-size:clamp(1.05rem,1.7vw,1.35rem);line-height:1.3;font-weight:700;text-wrap:balance}
+.acts{display:flex;gap:8px;align-items:center;flex:0 0 auto}
+.ib{width:42px;height:42px;border-radius:12px;border:1px solid var(--hair);background:var(--surface);display:grid;place-items:center}
+.ib:hover{background:var(--surface-2)}
+.ib:disabled{opacity:.35;cursor:default}
+.ib svg,.pill svg{width:20px;height:20px}
+.pill{height:42px;border-radius:12px;border:1px solid var(--hair);background:var(--surface);display:inline-flex;align-items:center;gap:8px;padding:0 14px;font-weight:600}
+.pill:hover{background:var(--surface-2)}
 
-/* shared solution visuals */
+.ans{display:flex;gap:12px;align-items:flex-start;background:var(--good-soft);border-radius:16px;padding:12px 14px}
+.al{flex:0 0 auto;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:var(--good);padding-top:5px}
+.achips{display:flex;flex-wrap:wrap;gap:6px}
+.achips span{background:var(--surface);border-radius:999px;padding:3px 12px;font-weight:600;font-size:.92rem;border:1px solid color-mix(in srgb,var(--good) 30%,transparent)}
+
+.work{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:14px;align-items:start}
+.steps{position:sticky;top:calc(16px + env(safe-area-inset-top,0px));background:var(--surface);border:1px solid var(--hair);border-radius:20px;padding:14px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:12px}
+.sh{display:flex;gap:10px;align-items:center}
+.sh img{width:42px;height:42px;object-fit:contain;background:#fff;border-radius:12px;padding:2px;transform:scaleX(-1)}
+.sh .st{font-weight:700}
+.sh .ss{font-size:.82rem;color:var(--muted)}
+.mode{display:grid;grid-template-columns:1fr 1fr;background:var(--surface-2);border-radius:12px;padding:3px}
+.mode button{border:0;background:transparent;border-radius:10px;padding:7px;font-weight:600;color:var(--muted)}
+.mode button[aria-pressed="true"]{background:var(--surface);color:var(--fg);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.play{border:0;border-radius:12px;background:var(--accent);color:var(--accent-fg);font-weight:700;padding:10px 14px;display:flex;align-items:center;justify-content:center;gap:8px}
+.play svg{width:16px;height:16px}
+.sl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px;position:relative}
+.sb{width:100%;display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;text-align:left;border:0;background:transparent;border-radius:12px;padding:8px;color:var(--muted);font-size:.93rem;line-height:1.4}
+.sb:hover{background:var(--surface-2)}
+.sb .k{width:28px;height:28px;border-radius:50%;border:2px solid var(--hair);display:grid;place-items:center;font-size:.8rem;font-weight:700;background:var(--surface);position:relative;z-index:1}
+.sb.done{color:var(--fg)}
+.sb.done .k{background:var(--good);border-color:var(--good);color:var(--surface)}
+.sb.cur{background:var(--accent-soft);color:var(--fg);font-weight:600}
+.sb.cur .k{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.kbd{margin:0;font-size:.78rem;color:var(--muted)}
+.kbd kbd{font-family:var(--ui);font-size:.75rem;border:1px solid var(--hair);border-bottom-width:2px;border-radius:6px;padding:0 5px;background:var(--surface-2)}
+
+/* the worksheet — always paper-white, whatever the theme */
+.paper{container-type:inline-size;min-width:0;background:#fff;color:var(--ink);border-radius:20px;padding:18px clamp(12px,2.5vw,26px) 22px;box-shadow:var(--shadow);border:1px solid var(--hair);touch-action:pan-y;
+  --ink:#2E2723;--muted:#76685E;--coral:#E5505A;--coral-deep:#B9363F;--orange:#F2922E;--cream:#FFF2E0;--line:#EDDDCB;--ok:#2C9A57;--ok-soft:#E2F4E8;--display:var(--ui)}
+
+.mbar{display:none}
+.exit{display:none}
+
+/* present mode */
+.present .nav,.present .ans{display:none}
+.present .app{grid-template-columns:minmax(0,1fr);max-width:none}
+.present .work{grid-template-columns:minmax(0,1fr) 380px}
+.present .sb{font-size:1.05rem}
+.present .exit{display:inline-flex}
+.present #present{display:none}
+
+@media (max-width:1180px){
+  .work{grid-template-columns:minmax(0,1fr)}
+  .steps{position:static}
+  .present .work{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:860px){
+  .app{grid-template-columns:minmax(0,1fr);padding-bottom:calc(92px + env(safe-area-inset-bottom,0px))}
+  .nav{position:static;max-height:none;border-radius:18px}
+  .brand{padding:12px 14px 6px}
+  .filters{flex-wrap:nowrap;overflow-x:auto;padding:4px 14px 10px;scrollbar-width:none}
+  .fc{flex:0 0 auto}
+  .navlist{display:flex;gap:6px;overflow-x:auto;padding:10px 14px 12px;scrollbar-width:thin}
+  .navlist li{flex:0 0 auto}
+  .ni{display:flex;flex-direction:column;gap:4px;width:auto;padding:4px}
+  .ni .nt,.ni .ns{display:none}
+  .ni .seen{display:none}
+  .ni.v .n{box-shadow:inset 0 0 0 2px var(--good)}
+  .ni[aria-current="true"] .n{box-shadow:none}
+  .ph{flex-wrap:wrap;gap:12px;padding:12px}
+  .pn{width:48px;height:48px;font-size:1.25rem;border-radius:14px}
+  .acts{width:100%;justify-content:space-between}
+  .kbd{display:none}
+  .mbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:20;gap:8px;align-items:center;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--hair);
+    padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+  .mbar .ib{flex:0 0 auto}
+  .mbar .play{flex:1}
+  .mbar .cnt{font-family:var(--head);font-weight:700;font-size:.85rem;color:var(--muted);min-width:44px;text-align:center;font-variant-numeric:tabular-nums}
+  .steps .play{display:none}
+}
+
+/* ---------- worksheet components ---------- */
 .card{background:#fff;border:2px solid var(--line);border-radius:14px;display:grid;place-items:center;position:relative;padding:6px}
 .card img{width:100%;height:100%;object-fit:contain}
 .good{border-color:var(--ok)!important;box-shadow:0 0 0 4px rgba(44,154,87,.18);animation:pop .45s cubic-bezier(.2,1.6,.4,1)}
@@ -100,14 +172,13 @@ main{padding-block:16px 40px}
 .wires line{stroke:var(--coral);stroke-width:5;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:0}
 .wires line.anim{animation:draw .8s ease-out backwards}
 @keyframes draw{from{stroke-dashoffset:1}}
-.num{flex:0 0 auto;width:26px;height:26px;border-radius:50%;background:var(--coral);color:#fff;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:.95rem}
-.tag{position:absolute;transform:translate(-50%,-50%);background:var(--coral);color:#fff;font-family:var(--display);font-weight:800;border-radius:999px;padding:0 10px;font-size:.95rem;white-space:nowrap;animation:pop .4s backwards;box-shadow:0 2px 0 rgba(0,0,0,.15);z-index:3;pointer-events:none}
+.num{flex:0 0 auto;width:26px;height:26px;border-radius:50%;background:var(--coral);color:#fff;display:grid;place-items:center;font-weight:800;font-size:.9rem}
+.tag{position:absolute;transform:translate(-50%,-50%);background:var(--coral);color:#fff;font-weight:800;border-radius:999px;padding:0 10px;font-size:.92rem;white-space:nowrap;animation:pop .4s backwards;box-shadow:0 2px 0 rgba(0,0,0,.15);z-index:3;pointer-events:none}
 .tag.round{width:30px;height:30px;padding:0;display:grid;place-items:center}
 .mark{position:absolute;width:12%;aspect-ratio:1;border:4px solid var(--coral);border-radius:50%;transform:translate(-50%,-50%);pointer-events:none;animation:pop .45s cubic-bezier(.2,1.6,.4,1);box-shadow:0 0 0 3px rgba(255,255,255,.85)}
 .say-box{background:#fff;border:2px solid #D9D2CC;border-radius:16px;padding:8px 14px;font-weight:700;animation:pop .4s}
 .instant *,.instant *::after,.instant *::before{animation:none!important;transition:none!important}
 
-/* p8 */
 .hgrid{display:grid;grid-template-columns:minmax(0,1fr) 120px;gap:14px;align-items:start}
 .scene{position:relative;border-radius:16px;overflow:hidden;border:3px solid #F0C86A}
 .scene img{width:100%}
@@ -118,15 +189,13 @@ main{padding-block:16px 40px}
 .si.found{border-color:var(--ok);background:var(--ok-soft)}
 .si.found .tk{background:var(--ok);border-color:var(--ok);animation:pop .4s}
 .si.found .tk::after{content:"";width:9px;height:5px;border-left:3px solid #fff;border-bottom:3px solid #fff;transform:rotate(-45deg) translate(1px,-1px)}
-@media (max-width:640px){.hgrid{grid-template-columns:1fr}.seek{flex-direction:row;flex-wrap:wrap;order:-1}.si{flex:1 1 calc(25% - 8px);justify-content:center}.si img{width:38px;height:38px}}
+@container (max-width:560px){.hgrid{grid-template-columns:1fr}.seek{flex-direction:row;flex-wrap:wrap;order:-1}.si{flex:1 1 calc(25% - 8px);justify-content:center}.si img{width:38px;height:38px}}
 
-/* columns */
-.cols{display:grid;grid-template-columns:1fr 1fr;gap:12px clamp(60px,18vw,220px);max-width:560px;margin:0 auto}
-.cols .card{width:100%;max-width:110px;aspect-ratio:1}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:12px clamp(50px,16cqi,200px);max-width:540px;margin:0 auto}
+.cols .card{width:100%;max-width:104px;aspect-ratio:1}
 .cols .l{justify-self:start;display:flex;align-items:center;gap:12px}
 .cols .r{justify-self:end;display:flex;align-items:center;gap:12px}
 
-/* p10 */
 .tgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
 .tr{background:var(--cream);border:2px solid #F3D9BA;border-radius:16px;padding:6px;position:relative}
 .tr .ref{position:absolute;left:8px;top:8px;width:44px;height:44px;background:#fff;border-radius:10px;padding:3px;border:2px solid var(--line)}
@@ -134,9 +203,8 @@ main{padding-block:16px 40px}
 .tr .ink{stroke-dasharray:1;stroke-dashoffset:0}
 .tr .ink.anim{animation:draw 1.6s ease-in-out backwards}
 .tr .fill{transition:fill .6s .9s}
-@media (max-width:620px){.tgrid{grid-template-columns:1fr 1fr}}
+@container (max-width:560px){.tgrid{grid-template-columns:1fr 1fr}}
 
-/* p11 */
 .prow{display:flex;align-items:center;gap:10px;margin-bottom:14px}
 .cells{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:6px;flex:1;min-width:0}
 .cell{aspect-ratio:1;border:2px solid var(--line);border-radius:10px;display:grid;place-items:center;padding:4px;background:#fff;position:relative}
@@ -145,193 +213,169 @@ main{padding-block:16px 40px}
 .cell.empty{border-color:#9C918A}
 .cell.empty img.o{opacity:.45}
 .cell .pop{animation:pop .45s cubic-bezier(.2,1.6,.4,1) backwards}
-@media (max-width:560px){.cells{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@container (max-width:520px){.cells{grid-template-columns:repeat(4,minmax(0,1fr))}}
 
-/* p12 */
-.frow{display:flex;justify-content:center;gap:10px;flex-wrap:nowrap}
+.frow{display:flex;justify-content:center;gap:10px}
 .fr{display:flex;flex-direction:column;align-items:center;gap:8px}
-.fr .card{width:min(80px,15vw);aspect-ratio:1}
+.fr .card{width:min(80px,15cqi);aspect-ratio:1}
 .baskets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:36px auto;max-width:600px}
 .basket{display:flex;flex-direction:column;align-items:center;gap:6px}
-.basket .b{width:min(140px,24vw)}
-.sign{width:60px;height:60px;border:3px solid var(--coral);border-radius:50%;padding:7px;background:#fff}
-.bc{font-family:var(--display);font-weight:800;font-size:1.2rem;color:var(--coral-deep);min-height:1.5em}
-.bc span{animation:pop .4s backwards}
+.basket .b{width:min(140px,24cqi)}
+.sign{width:56px;height:56px;border:3px solid var(--coral);border-radius:50%;padding:7px;background:#fff}
+.bc{font-weight:800;font-size:1.15rem;color:var(--coral-deep);min-height:1.5em}
+.bc span{display:inline-block;animation:pop .4s backwards}
 
-/* p13 */
 .cut{display:grid;grid-template-columns:minmax(0,1.1fr) 40px repeat(3,minmax(0,1fr));gap:10px;align-items:center;background:var(--cream);border:2px solid #F3D9BA;border-radius:16px;padding:10px;margin-bottom:10px}
 .cut .card{aspect-ratio:1}
 .arrow{height:4px;background:var(--coral);border-radius:2px;position:relative}
 .arrow::after{content:"";position:absolute;right:-2px;top:-5px;border:7px solid transparent;border-left:10px solid var(--coral);border-right:0}
 .cut.hl{box-shadow:0 0 0 4px #FFD866}
-@media (max-width:480px){.cut{grid-template-columns:minmax(0,1fr) 16px repeat(3,minmax(0,1fr));gap:6px}}
+@container (max-width:460px){.cut{grid-template-columns:minmax(0,1fr) 16px repeat(3,minmax(0,1fr));gap:6px}}
 
-/* p14 */
 .four{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
 .four .card{aspect-ratio:3/4;padding:0;overflow:hidden}
 .four .card img{object-fit:cover}
 .four .tool{aspect-ratio:1;padding:10px}
 .cw{display:flex;flex-direction:column;align-items:center;gap:8px}
-.gapv{height:clamp(50px,10vw,90px)}
+.gapv{height:clamp(50px,10cqi,90px)}
 .lines{display:flex;flex-direction:column;gap:8px;margin-top:14px;align-items:flex-start}
 
-/* p15 */
 .cg{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
 .cb{display:flex;flex-direction:column;align-items:center;gap:8px;padding:8px 4px;border-radius:14px;position:relative}
 .cb img{width:100%;max-width:150px}
 .circ,.nums{display:flex;gap:3px;border:2px solid var(--line);border-radius:999px;padding:4px 6px;background:#fff}
-.circ i{width:clamp(13px,2.8vw,20px);aspect-ratio:1;border-radius:50%;border:2px solid var(--ink)}
+.circ i{width:clamp(12px,2.6cqi,20px);aspect-ratio:1;border-radius:50%;border:2px solid var(--ink)}
 .circ i.on{background:var(--coral);border-color:var(--coral-deep);animation:pop .3s backwards}
 .nums{background:#FFF4E6}
-.nums span{font-family:var(--display);font-weight:700;width:clamp(16px,3.2vw,24px);aspect-ratio:1;display:grid;place-items:center;border-radius:50%;font-size:clamp(.85rem,2vw,1.05rem)}
+.nums span{font-weight:700;width:clamp(15px,3cqi,24px);aspect-ratio:1;display:grid;place-items:center;border-radius:50%;font-size:clamp(.8rem,1.9cqi,1rem)}
 .nums span.on{box-shadow:inset 0 0 0 2.5px var(--coral);color:var(--coral-deep);animation:pop .4s backwards}
 .cb.best{background:var(--ok-soft)}
 .cb.least{background:#FDE7E3}
-.cb .lbl{font-family:var(--display);font-weight:800;font-size:.9rem;color:var(--coral-deep);animation:pop .4s}
-@media (max-width:620px){.cg{grid-template-columns:1fr}.cb{flex-direction:row;flex-wrap:wrap;justify-content:center}.cb img{max-width:100px}}
+.cb .lbl{font-weight:800;font-size:.88rem;color:var(--coral-deep);animation:pop .4s}
+@container (max-width:560px){.cg{grid-template-columns:1fr}.cb{flex-direction:row;flex-wrap:wrap;justify-content:center}.cb img{max-width:100px}}
 
-/* p16 */
 .tg{display:flex;flex-direction:column;align-items:center;gap:28px}
 .tgt{display:flex;flex-direction:column;align-items:center;gap:10px}
 .tgt .im{display:flex;align-items:center;gap:12px}
-.tgt img{width:min(190px,38vw)}
-.tgt.wide img{width:min(290px,58vw)}
-.tgt .lab{font-family:var(--display);font-weight:800;letter-spacing:.12em;color:var(--muted)}
-.six{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;width:100%;max-width:640px}
+.tgt img{width:min(180px,36cqi)}
+.tgt.wide img{width:min(280px,56cqi)}
+.tgt .lab{font-weight:800;letter-spacing:.12em;color:var(--muted)}
+.six{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;width:100%;max-width:620px}
 .six .card{aspect-ratio:1;width:100%}
 
-/* p17 */
 .shelf{background:var(--cream);border:2px solid #F3D9BA;border-radius:18px;padding:12px;margin-bottom:12px}
-.shelf h3{margin:0 0 6px;font-family:var(--display);font-size:1.05rem}
+.shelf h3{margin:0 0 6px;font-size:1rem}
 .shelf .rel img{border-radius:10px}
 .opts{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.opts .card{width:92px;aspect-ratio:1}
+.opts .card{width:88px;aspect-ratio:1}
 
-/* rows */
 .irow{display:flex;align-items:center;gap:10px;margin-bottom:12px}
 .items{display:grid;gap:8px;flex:1;min-width:0}
 .items .card{aspect-ratio:1}
-.why{font-size:.9rem;color:var(--muted);margin:-6px 0 12px 36px;animation:pop .4s}
 
-/* p19 */
 .prw{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,5fr) minmax(0,1fr);align-items:center;gap:6px;margin-bottom:14px}
 .prw svg{width:100%;height:auto;display:block}
 
-/* p20 */
 .prep{display:grid;grid-template-columns:minmax(0,1.1fr) repeat(3,minmax(0,1fr));gap:10px;margin-bottom:10px}
-.phr{background:var(--cream);border:2px solid #F3D9BA;border-radius:16px;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px;font-family:var(--display);font-weight:700;font-size:1.1rem;position:relative}
+.phr{background:var(--cream);border:2px solid #F3D9BA;border-radius:16px;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px;font-weight:700;font-size:1.05rem;position:relative}
 .phr em{font-style:normal;color:var(--coral)}
 .phr .num{position:absolute;left:8px;top:8px}
 .prep .card{aspect-ratio:4/5;padding:0}
 .prep .card img{object-fit:cover;border-radius:12px}
 
-/* p21 */
-.maze svg{width:100%;max-width:520px;height:auto;display:block;margin:0 auto}
+.maze svg{width:100%;max-width:500px;height:auto;display:block;margin:0 auto}
 
-/* p22 */
 .three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .three .card{aspect-ratio:1;padding:0}
 .three .card img{object-fit:cover;border-radius:12px}
 .three .num{position:absolute;left:8px;top:8px;z-index:1}
 .ends{background:var(--cream);border:2px solid #F3D9BA;border-radius:18px;padding:12px;margin-top:14px}
-.ends h3{text-align:center;margin:0 0 10px;font-family:var(--display)}
-.cap{position:absolute;left:6px;right:6px;bottom:6px;background:rgba(255,255,255,.92);border-radius:10px;padding:4px 8px;font-size:.85rem;font-weight:700;animation:pop .4s backwards}
+.ends h3{text-align:center;margin:0 0 10px}
+.cap{position:absolute;left:6px;right:6px;bottom:6px;background:rgba(255,255,255,.93);border-radius:10px;padding:4px 8px;font-size:.82rem;font-weight:700;animation:pop .4s backwards}
 
-/* p24/p28 */
-.canvas-wrap{position:relative;max-width:560px;margin:0 auto}
+.canvas-wrap{position:relative;max-width:540px;margin:0 auto}
 .canvas-wrap canvas{width:100%;height:auto;display:block;border:3px solid #F0C86A;border-radius:16px;background:#fff}
 .canvas-wrap.wide{max-width:none}
 .pick{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin-top:12px}
 .pick .card{aspect-ratio:1}
-@media (max-width:520px){.pick{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@container (max-width:480px){.pick{grid-template-columns:repeat(3,minmax(0,1fr))}}
 
-/* p25 */
 .spot{display:grid;gap:12px}
 .spot .scene .mark{width:11%}
 
-/* p26 */
 .drow{display:grid;grid-template-columns:minmax(0,1fr) 40px minmax(0,1.4fr);gap:12px;align-items:center;background:var(--cream);border:2px solid #F3D9BA;border-radius:18px;padding:12px;margin-bottom:12px;position:relative}
 .drow .numtag{position:absolute;left:10px;top:10px}
 .drow figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:6px}
-.drow figcaption{font-family:var(--display);font-weight:700;color:var(--muted)}
+.drow figcaption{font-weight:700;color:var(--muted)}
 .drow svg{width:100%;height:auto;display:block;background:#fff;border-radius:14px;border:2px solid var(--line)}
-.drow figure svg{max-width:190px}
-.drow .user svg{max-width:280px;margin:0 auto;border-color:#8D847E}
+.drow figure svg{max-width:180px}
+.drow .user svg{max-width:260px;margin:0 auto;border-color:#8D847E}
 .drow .arrow{background:#999}.drow .arrow::after{border-left-color:#999}
 .seg{stroke-dasharray:1;stroke-dashoffset:0}
 .seg.anim{animation:draw .5s ease-out backwards}
 
-/* p27 */
 .test{background:var(--cream);border:2px solid #F3D9BA;border-radius:18px;padding:12px 14px;margin-bottom:12px}
-.test h3{margin:0 0 10px;display:flex;align-items:center;gap:8px;font-size:1.02rem}
+.test h3{margin:0 0 10px;display:flex;align-items:center;gap:8px;font-size:1rem}
 .rowi{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.test .card{width:min(72px,14vw);aspect-ratio:3/4}
-.q{border:3px dashed #A99F98;border-radius:14px;width:min(72px,14vw);aspect-ratio:3/4;display:grid;place-items:center;font-family:var(--display);font-size:2rem;color:#A99F98;background:#fff;padding:6px}
+.test .card{width:min(70px,13cqi);aspect-ratio:3/4}
+.q{border:3px dashed #A99F98;border-radius:14px;width:min(70px,13cqi);aspect-ratio:3/4;display:grid;place-items:center;font-size:2rem;font-weight:800;color:#A99F98;background:#fff;padding:6px}
 .q img{width:100%;height:100%;object-fit:contain;animation:pop .45s}
 .vbar{width:2px;align-self:stretch;background:#8A807A;margin:0 6px}
 
-/* answer key */
-.key{margin-top:26px}
-.key h2{font-family:var(--display);font-size:1.4rem;margin:0 0 4px}
-.key p{margin:0 0 12px;color:var(--muted)}
-.kgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
-.kc{display:grid;grid-template-columns:40px minmax(0,1fr);gap:10px;align-items:start;text-align:left;border:2px solid var(--line);background:#fff;border-radius:14px;padding:10px;cursor:pointer}
-.kc:hover{border-color:#C9DDBE}
-.kc .n{width:40px;height:40px;border-radius:50%;background:var(--leaf);color:#fff;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:1.1rem}
-.kc .a{font-size:.92rem}
-.kc .a b{display:block;font-size:.8rem;color:var(--muted);font-weight:700}
-@media (max-width:560px){.narr{grid-template-columns:52px minmax(0,1fr)}.narr img{width:52px}.ctrl .btn{padding:8px 12px}.btn.primary{min-width:0;flex:1}#all{order:5}.pips{order:6;margin-left:auto}}
 @media (prefers-reduced-motion:reduce){*,*::after,*::before{animation:none!important;transition:none!important}}
 </style>
 
-<header class="hero gut">
-  <div class="in">
-    <div class="top">
-      <div>
-        <div class="kicker">IDC Kids · 3–4 yosh · 1-bob</div>
-        <h1>Boğ va mevalar: <em>yechimlar yöli</em></h1>
-      </div>
-      <p class="legend">Toşni tanla, keyin «Yechimni körsat» tugmasini bos. Tipratikan har bir betni qadamma-qadam tuşuntirib beradi.</p>
+<div class="app">
+  <aside class="nav" aria-label="Betlar">
+    <div class="brand">
+      <div class="logo">1</div>
+      <div><div class="eyebrow">IDC Kids · 3–4 yosh</div><div class="bt">Boğ va mevalar</div></div>
     </div>
-    <div class="trail" id="trail"></div>
-  </div>
-</header>
+    <div class="filters" id="filters" role="group" aria-label="Könikma böyiça saralaş"></div>
+    <ol class="navlist" id="navlist"></ol>
+  </aside>
 
-<main class="gut">
-  <div class="in">
-    <article class="sheet">
-      <div class="head">
-        <div class="pnum" id="pnum">8</div>
-        <div class="t">
-          <h2 id="ptitle"></h2>
-          <div class="answer" id="answer" hidden><b>Javob</b><span id="answerText"></span></div>
+  <main class="main">
+    <header class="ph">
+      <div class="pn" id="pn">8</div>
+      <div class="pt">
+        <div class="meta"><span class="skill" id="skill"></span><span class="diff" id="diff"></span><span id="bet"></span></div>
+        <h1 id="title"></h1>
+      </div>
+      <div class="acts">
+        <div style="display:flex;gap:8px">
+          <button class="ib" id="prevP" type="button" aria-label="Oldingi bet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+          <button class="ib" id="nextP" type="button" aria-label="Keyingi bet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
         </div>
+        <button class="pill" id="present" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>Taqdimot</button>
+        <button class="pill exit" id="exit" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>Çiqiş</button>
       </div>
-      <div class="narr">
-        <img src="img/145.webp" alt="Tipratikan">
-        <div class="bubble" aria-live="polite">
-          <span class="cnt" id="cnt"></span>
-          <span class="say" id="say"></span>
-        </div>
-      </div>
-      <div class="ctrl">
-        <button class="btn" id="restart" type="button" aria-label="Boshidan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></button>
-        <button class="btn" id="back" type="button" aria-label="Oldingi qadam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
-        <button class="btn primary" id="play" type="button"></button>
-        <button class="btn" id="fwd" type="button" aria-label="Keyingi qadam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
-        <button class="btn" id="all" type="button">Hammasini oç</button>
-        <div class="pips" id="pips"></div>
-      </div>
-      <div class="stage" id="stage"></div>
-    </article>
+    </header>
 
-    <section class="key">
-      <h2>Qisqa javoblar</h2>
-      <p>Tekşirib çiqiş uçun: kartaçani bossang, şu betning yechimi oçiladi.</p>
-      <div class="kgrid" id="kgrid"></div>
-    </section>
-  </div>
-</main>
+    <section class="ans" aria-label="Javob"><span class="al">Javob</span><div class="achips" id="achips"></div></section>
+
+    <div class="work">
+      <div class="paper" id="stage"></div>
+      <aside class="steps" aria-label="Yechim qadamlari">
+        <div class="sh"><img src="img/145.webp" alt=""><div><div class="st">Tipratikan tuşuntiradi</div><div class="ss" id="ss"></div></div></div>
+        <div class="mode" role="group" aria-label="Körinish">
+          <button type="button" id="mTask" aria-pressed="false">Topşiriq</button>
+          <button type="button" id="mSol" aria-pressed="true">Yechim</button>
+        </div>
+        <button class="play" id="play" type="button"></button>
+        <ol class="sl" id="sl"></ol>
+        <p class="kbd"><kbd>←</kbd> <kbd>→</kbd> qadamlar · <kbd>Shift</kbd> + <kbd>←</kbd> <kbd>→</kbd> betlar</p>
+      </aside>
+    </div>
+  </main>
+</div>
+
+<nav class="mbar" aria-label="Qadamlar">
+  <button class="ib" id="mPrev" type="button" aria-label="Oldingi qadam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+  <span class="cnt" id="mCnt"></span>
+  <button class="play" id="mPlay" type="button"></button>
+  <button class="ib" id="mNext" type="button" aria-label="Keyingi qadam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+</nav>
 
 <script>
 (() => {
@@ -349,9 +393,9 @@ function s(tag, attrs, ...kids) { const n = document.createElementNS(NS, tag); f
 const pic = (id, alt = '') => h('img', { src: IMG(id), alt, draggable: 'false' });
 const card = (id, alt = '', cls = '') => h('div', { class: 'card ' + cls }, pic(id, alt));
 const stagger = (els, gap = .15) => els.forEach((e, i) => e.style.animationDelay = (i * gap) + 's');
-let INSTANT = false;
+const store = { get(k, d) { try { const v = localStorage.getItem('boqy.' + k); return v == null ? d : JSON.parse(v); } catch { return d; } }, set(k, v) { try { localStorage.setItem('boqy.' + k, JSON.stringify(v)); } catch {} } };
+let INSTANT = false, runTok = 0;
 
-/* lines between DOM nodes */
 function wires(root) {
   const svg = s('svg', { class: 'wires' }); root.append(svg);
   const links = []; let lw = 0, lh = 0;
@@ -365,12 +409,10 @@ function wires(root) {
 }
 const tag = (box, x, y, text, round) => { const t = h('span', { class: 'tag' + (round ? ' round' : '') }, text); t.style.left = x + '%'; t.style.top = y + '%'; box.append(t); return t; };
 const mark = (box, x, y) => { const m = h('span', { class: 'mark' }); m.style.left = x + '%'; m.style.top = y + '%'; box.append(m); return m; };
-function animate(dur, fn) { if (INSTANT) { fn(1); return; } const t0 = performance.now(); const tick = now => { const p = Math.min(1, (now - t0) / dur); fn(p); if (p < 1 && !cancelled()) requestAnimationFrame(tick); }; const tok = runTok; const cancelled = () => tok !== runTok; requestAnimationFrame(tick); }
-let runTok = 0;
+function animate(dur, fn) { if (INSTANT) { fn(1); return; } const tok = runTok, t0 = performance.now(); const tick = now => { if (tok !== runTok) return; const p = Math.min(1, (now - t0) / dur); fn(p); if (p < 1) requestAnimationFrame(tick); }; requestAnimationFrame(tick); }
 
-/* flood-fill canvas */
 function fillCanvas(src) {
-  const cv = h('canvas'); const ctx = cv.getContext('2d', { willReadFrequently: true });
+  const cv = h('canvas', { 'aria-label': 'Rasm' }); const ctx = cv.getContext('2d', { willReadFrequently: true });
   const ready = new Promise(res => { const im = new Image(); im.onload = () => { cv.width = im.naturalWidth; cv.height = im.naturalHeight; ctx.drawImage(im, 0, 0); res(); }; im.src = src; });
   function fill(px, py, color) {
     const W = cv.width, H = cv.height, x = Math.floor(px / 100 * W), y = Math.floor(py / 100 * H);
@@ -389,11 +431,11 @@ function fillCanvas(src) {
 }
 
 /* ---------------- solutions ---------------- */
+const SKILLS = { diqqat: ['Diqqat', '#3B82C4'], mantiq: ['Mantiq', '#8E5BD0'], saralash: ['Saralaş', '#C98316'], sanash: ['Sanaş', '#E5505A'], motorika: ['Qöl motorikasi', '#2F9E6E'], xotira: ['Xotira', '#C2508F'], nutq: ['Nutq', '#1F9BAA'], sinov: ['Sinov', '#7A817C'], ijod: ['Ijod', '#E07B39'] };
 const P = [];
-const add = (n, title, answer, setup) => P.push({ n, title, answer, setup });
+const add = (n, short, skill, stars, title, answer, setup) => P.push({ n, short, skill, stars, title, answer, setup });
 
-add(8, 'Boğni kör! Öngdagi 8 ta narsani rasmdan top. Topganingni belgila.', '8 ta narsa topildi · yerda 4 ta anor', st => {
-  const R = 2400 / 1792;
+add(8, 'Yaşirin narsalar', 'diqqat', 1, 'Boğni kör! Öngdagi 8 ta narsani rasmdan top. Topganingni belgila.', '8 ta narsa topildi · yerda 4 ta anor', st => {
   const items = [
     ['001', [21, 88], 'Tipratikan pastda, barglar uyumiga kirib olgan.'],
     ['002', [11, 66], 'Muşuk çap tomonda, buta orqasidan möralayapti.'],
@@ -415,7 +457,7 @@ add(8, 'Boğni kör! Öngdagi 8 ta narsani rasmdan top. Topganingni belgila.', '
   ];
 });
 
-add(9, 'Har birini öz soyasi bilan çiziq orqali ula.', '5 juft · barg soyasining jufti yöq', st => {
+add(9, 'Soyalar', 'mantiq', 1, 'Har birini öz soyasi bilan çiziq orqali ula.', '5 juft · barg soyasining jufti yöq', st => {
   const L = [['009', 'a'], ['010', 'p'], ['011', 'g'], ['012', 'u'], ['013', 'c']];
   const R = [['014', 'u'], ['015', 'g'], ['016', 'leaf'], ['017', 'a'], ['018', 'c'], ['019', 'p']];
   const grid = h('div', { class: 'cols rel' }); const ld = {}, rd = {}, rc = {};
@@ -429,7 +471,7 @@ add(9, 'Har birini öz soyasi bilan çiziq orqali ula.', '5 juft · barg soyasin
     ['Zukko qadam: bitta soya ortiqça qoldi — bu barg soyasi! Çapda barg yöq.', () => rc.leaf.classList.add('ring')]];
 });
 
-add(10, 'Punktir böylab çizib, mevalarni tugat. Keyin ularni böya.', '4 ta meva çizildi va böyaldi', st => {
+add(10, 'Punktir böylab', 'motorika', 1, 'Punktir böylab çizib, mevalarni tugat. Keyin ularni böya.', 'olma — qizil · nok — sariq · anor — tög qizil · tarvuz — yaşil', st => {
   const shapes = [
     ['020', 'Olma: yaşil nuqtadan boşlab aylana çizamiz, keyin bandi va bargini qöşamiz. Qizilga böyaymiz.', 'M100 66 C 116 52, 156 52, 160 100 C 164 150, 128 182, 100 168 C 72 182, 36 150, 40 100 C 44 52, 84 52, 100 66 Z M100 66 C 100 52, 104 42, 110 34 M104 48 C 112 26, 140 22, 154 30 C 144 46, 122 54, 104 48', '#E5404A'],
     ['021', 'Nok: tepasi ingiçka, pasti keng. Sariqqa böyaymiz.', 'M100 46 C 116 46, 120 76, 130 94 C 152 118, 162 138, 156 158 C 148 186, 52 186, 44 158 C 38 138, 48 118, 70 94 C 80 76, 84 46, 100 46 Z M100 46 C 100 34, 104 24, 110 18', '#F5C731'],
@@ -450,7 +492,7 @@ add(10, 'Punktir böylab çizib, mevalarni tugat. Keyin ularni böya.', '4 ta me
   return shapes.map(([, t], i) => [t, () => { const p = parts[i]; p.ink.setAttribute('visibility', 'visible'); if (!INSTANT) p.ink.classList.add('anim'); p.fill.setAttribute('fill', p.col); }]);
 });
 
-add(11, 'Naqşni davom ettir. Böş joylarni töğri rangga böya.', 'qizil-sariq · qizil-yaşil · katta-kiçik', st => {
+add(11, 'Naqş', 'mantiq', 1, 'Naqşni davom ettir. Böş joylarni töğri rangga böya.', 'qizil–sariq · qizil–yaşil · katta–kiçik', st => {
   const rows = [['024', '025', '028', false], ['032', '033', '036', false], ['040', '040', '044', true]];
   const slots = rows.map(([a, b, o, sz], ri) => {
     const cells = h('div', { class: 'cells' });
@@ -468,7 +510,7 @@ add(11, 'Naqşni davom ettir. Böş joylarni töğri rangga böya.', 'qizil-sari
   ];
 });
 
-add(12, 'Har savatning tagida belgi bor. Har mevani öz savatiga çiziq bilan ula.', 'har savatda 3 tadan — teng', st => {
+add(12, 'Savatlar', 'saralash', 1, 'Har savatning tagida belgi bor. Har mevani öz savatiga çiziq bilan ula.', 'har savatda 3 tadan — teng', st => {
   const top = [['052', 'a'], ['053', 'g'], ['054', 'p'], ['055', 'a'], ['056', 'g']], bot = [['063', 'p'], ['064', 'a'], ['065', 'p'], ['066', 'g']];
   const root = h('div', { class: 'rel' }); const F = [];
   const row = (list, pos) => { const r = h('div', { class: 'frow' }); list.forEach(([id, k]) => { const d = h('span', { class: 'dot' }); const c = card(id); F.push({ k, pos, d, c }); r.append(pos === 't' ? h('div', { class: 'fr' }, c, d) : h('div', { class: 'fr' }, d, c)); }); return r; };
@@ -484,14 +526,14 @@ add(12, 'Har savatning tagida belgi bor. Har mevani öz savatiga çiziq bilan ul
   ];
 });
 
-add(13, 'Çapdagi mevani kessak, içi qanday böladi? Öngdan töğrisini topib doiraga ol.', 'olma · anor donalari · şaftoli · tarvuz', st => {
+add(13, 'Mevaning içi', 'mantiq', 1, 'Çapdagi mevani kessak, içi qanday böladi? Öngdan töğrisini topib doiraga ol.', 'olma · anor donalari · şaftoli · tarvuz', st => {
   const rows = [['067', ['068', '069', '070'], 1, 'Olma içi oq, örtasida mayda qora uruğlar bor.'], ['071', ['072', '073', '074'], 0, 'Anor içi qip-qizil donalarga töla.'], ['075', ['076', '077', '078'], 2, 'Şaftoli içida bitta katta jigarrang danak bor.'], ['079', ['080', '081', '082'], 2, 'Tarvuz içi qizil, qora uruğli.']];
   const R = rows.map(([w, o, a]) => { const cs = o.map(id => card(id)); const r = h('div', { class: 'cut' }, card(w), h('div', { class: 'arrow' }), ...cs); st.append(r); return { r, c: cs[a], others: cs.filter((_, i) => i !== a) }; });
   return [...rows.map(([, , , t], i) => [t, () => { R[i].c.classList.add('ring', 'good'); R[i].others.forEach(o => o.classList.add('dim')); }]),
     ['Zukko qadam: bitta katta danak — şaftolida!', () => R[2].r.classList.add('hl')]];
 });
 
-add(14, 'Avval har kimni kerakli narsasi bilan çiziq orqali ula. Keyin ayt: kim nima bilan işladi?', 'bobo–suğorgiç · bola–supurgi · qiz–savat · buvi–belkurak', st => {
+add(14, 'Kim nima bilan?', 'nutq', 1, 'Avval har kimni kerakli narsasi bilan çiziq orqali ula. Keyin ayt: kim nima bilan işladi?', 'bobo — suğorgiç · bola — supurgi · qiz — savat · buvi — belkurak', st => {
   const ppl = [['083', 'w'], ['084', 'b'], ['085', 's'], ['086', 'k']], tools = [['087', 's'], ['088', 'k'], ['089', 'w'], ['090', 'b']];
   const root = h('div', { class: 'rel' }); const top = h('div', { class: 'four' }), bot = h('div', { class: 'four' }); const A = {}, B = {};
   ppl.forEach(([id, k]) => { const d = h('span', { class: 'dot' }), c = card(id); A[k] = { d, c }; top.append(h('div', { class: 'cw' }, c, d)); });
@@ -501,7 +543,7 @@ add(14, 'Avval har kimni kerakli narsasi bilan çiziq orqali ula. Keyin ayt: kim
   return S.map(([k, t, line]) => [t, () => { w.add([[A[k].d, B[k].d]]); A[k].c.classList.add('good'); B[k].c.classList.add('good'); lines.append(h('div', { class: 'say-box' }, '«' + line + '»')); }]);
 });
 
-add(15, 'Avval har savatdagi olmalarni sana va tagida şunça doiraçani böya. Keyin şu sonni doiraga ol.', '4 · 1 · 5 · 2 · 3', st => {
+add(15, 'Olmalarni sana', 'sanash', 2, 'Avval har savatdagi olmalarni sana va tagida şunça doiraçani böya. Keyin şu sonni doiraga ol.', '4 · 1 · 5 · 2 · 3 · eng köp — 3-savat', st => {
   const n = [4, 1, 5, 2, 3]; const grid = h('div', { class: 'cg' }); st.append(grid);
   const B = n.map((c, i) => { const circ = h('div', { class: 'circ' }), nums = h('div', { class: 'nums' }); for (let k = 1; k <= 5; k++) { circ.append(h('i')); nums.append(h('span', {}, String(k))); } const box = h('div', { class: 'cb' }, pic('b' + (i + 1)), circ, nums); grid.append(box); return { box, circ, nums, c }; });
   const show = i => () => { const b = B[i]; const on = [...b.circ.children].slice(0, b.c); on.forEach(x => x.classList.add('on')); stagger(on, .25); const nn = b.nums.children[b.c - 1]; nn.classList.add('on'); nn.style.animationDelay = (b.c * .25) + 's'; };
@@ -510,7 +552,7 @@ add(15, 'Avval har savatdagi olmalarni sana va tagida şunça doiraçani böya. 
     ['Zukko qadam: eng köp olma 3-savatda (5 ta), eng kam olma 2-savatda (1 ta).', () => { B[2].box.classList.add('best'); B[2].box.append(h('span', { class: 'lbl' }, 'Eng köp')); B[1].box.classList.add('least'); B[1].box.append(h('span', { class: 'lbl' }, 'Eng kam')); }]];
 });
 
-add(16, 'Mevalarni daraxtga, sabzavotlarni tomorqaga çiziq bilan ula.', 'daraxt: olma, anor, nok · tomorqa: sabzi, kartoşka, bodring', st => {
+add(16, 'Meva yoki sabzavot', 'saralash', 2, 'Mevalarni daraxtga, sabzavotlarni tomorqaga çiziq bilan ula.', 'daraxt: olma, anor, nok · tomorqa: sabzi, kartoşka, bodring', st => {
   const items = [['095', 't'], ['096', 'g'], ['097', 't'], ['098', 'g'], ['099', 't'], ['100', 'g']];
   const root = h('div', { class: 'rel tg' }); const td = h('span', { class: 'dot' }), gd = h('span', { class: 'dot' });
   const row = h('div', { class: 'six' }); const I = items.map(([id, k]) => { const t = h('span', { class: 'dot' }), b = h('span', { class: 'dot' }), c = card(id); row.append(h('div', { class: 'fr' }, t, c, b)); return { k, t, b, c }; });
@@ -522,7 +564,7 @@ add(16, 'Mevalarni daraxtga, sabzavotlarni tomorqaga çiziq bilan ula.', 'daraxt
   ];
 });
 
-add(17, 'Avval tepadagi tokçaga qara va eslab qol. Keyin pastdagi tokçada nima yöqolganini top.', 'qölqop · örtada turgan edi', st => {
+add(17, 'Nima yöqoldi?', 'xotira', 2, 'Avval tepadagi tokçaga qara va eslab qol. Keyin pastdagi tokçada nima yöqolganini top.', 'qölqop · örtada turgan edi', st => {
   const topBox = h('div', { class: 'rel' }, pic('102')), botBox = h('div', { class: 'rel' }, pic('103'));
   const opts = [['104', 0], ['105', 1], ['106', 0]].map(([id, ok]) => ({ c: card(id), ok }));
   st.append(h('div', { class: 'shelf' }, h('h3', {}, 'Eslab qol!'), topBox), h('div', { class: 'shelf' }, h('h3', {}, 'Bu yerda nima yöq?'), botBox), h('div', { class: 'opts' }, h('b', {}, 'Yöqolgan narsa:'), ...opts.map(o => o.c)));
@@ -535,14 +577,14 @@ add(17, 'Avval tepadagi tokçaga qara va eslab qol. Keyin pastdagi tokçada nima
   ];
 });
 
-add(18, 'Har qatorda ikkita rasm aynan bir xil. Ularni top va belgila.', '1–4 · 2–5 · 2–5 · 2–5', st => {
+add(18, 'Bir xil juftlar', 'diqqat', 2, 'Har qatorda ikkita rasm aynan bir xil. Ularni top va belgila.', '1-qator: 1 va 4 · 2-qator: 2 va 5 · 3-qator: 2 va 5 · 4-qator: 2 va 5', st => {
   const rows = [[['107', '108', '109', '110', '111'], [0, 3], 'Olmalar: 1 va 4 — ikkalasida barg öngda. 2-sida barg yöq, 3-sida barg çapda, 5-si yaşil.'], [['112', '113', '114', '115', '116'], [1, 4], 'Barglar: 2 va 5 — ikkalasi qizil. Qolganlari jigarrang, sariq, yaşil.'], [['117', '118', '119', '120', '121'], [1, 4], 'Tipratikanlar: 2 va 5 — çapga qaragan, ustida qizil olma. 1-si öngga qaragan, 3-sida yaşil olma, 4-sida olma yöq.'], [['122', '123', '124', '125', '126'], [1, 4], 'Savatlar: 2 va 5. 1-sining ikkita dastasi bor, 3-si oqiş, 4-si tög jigarrang.']];
   const R = rows.map(([ids, pr], ri) => { const items = h('div', { class: 'items' }); items.style.gridTemplateColumns = 'repeat(5,minmax(0,1fr))'; const cs = ids.map(id => card(id)); items.append(...cs); st.append(h('div', { class: 'irow' }, h('span', { class: 'num' }, String(ri + 1)), items)); return { cs, pr }; });
   return [...rows.map(([, , t], i) => [t, () => { R[i].cs.forEach((c, k) => R[i].pr.includes(k) ? c.classList.add('good') : c.classList.add('dim')); }]),
     ['Zukko qadam: 1-qatorda 3-olmaning bargi boşqa tomonda — çapda.', () => { R[0].cs[2].classList.remove('dim'); R[0].cs[2].classList.add('ring'); }]];
 });
 
-add(19, 'Har kimni öz yöli böylab olib bor. Yöldan çiqma!', 'kapalak→gul · tipratikan→olma · qiz→savat', st => {
+add(19, 'Yöl böylab', 'motorika', 2, 'Har kimni öz yöli böylab olib bor. Yöldan çiqma!', 'kapalak → gul · tipratikan → olma · qiz → savat', st => {
   const wave = [], steps = [], loops = [];
   for (let i = 0; i <= 300; i++) { const t = i / 300; wave.push([20 + t * 560, 80 + 52 * Math.sin(t * Math.PI * 9 - Math.PI / 2)]); }
   { let x = 20, y = 130; const pts = [[x, y]]; for (const [dx, dy] of [[60, 0], [0, -26], [60, 0], [0, -26], [60, 0], [0, -26], [60, 0], [0, 26], [60, 0], [0, 26], [60, 0], [0, 26], [60, 0]]) { for (let k = 1; k <= 12; k++) pts.push([x + dx * k / 12, y + dy * k / 12]); x += dx; y += dy; } const sx = 560 / (x - 20); pts.forEach(([px, py]) => steps.push([20 + (px - 20) * sx, py])); }
@@ -559,15 +601,14 @@ add(19, 'Har kimni öz yöli böylab olib bor. Yöldan çiqma!', 'kapalak→gul 
   return D.map(([, , , t], i) => [t, R[i]]);
 });
 
-add(20, 'Muşuk boğda berkinyapti. Har qatorda gapga mos rasmni top va doiraga ol.', 'içida · ustida · ostida · yonida', st => {
+add(20, 'Muşuk qayerda?', 'nutq', 2, 'Muşuk boğda berkinyapti. Har qatorda gapga mos rasmni top va doiraga ol.', 'içida — 2 · ustida — 3 · ostida — 1 · yonida — 2', st => {
   const rows = [['savat', 'içida', ['133', '134', '135'], 1, 'Savat içida — muşuk savatning içiga kirib olgan (2-rasm).'], ['daraxt', 'ustida', ['136', '137', '138'], 2, 'Daraxt ustida — muşuk şoxga çiqib olgan (3-rasm).'], ['örindiq', 'ostida', ['139', '140', '141'], 0, 'Örindiq ostida — muşuk örindiqning tagida yotibdi (1-rasm).'], ['çelak', 'yonida', ['142', '143', '144'], 1, 'Çelak yonida — muşuk çelakning yonida ötiribdi (2-rasm).']];
   const R = rows.map(([w, p, ids, a], ri) => { const cs = ids.map(id => card(id)); st.append(h('div', { class: 'prep' }, h('div', { class: 'phr' }, h('span', { class: 'num' }, String(ri + 1)), h('span', {}, 'Muşuk ' + w + ' ', h('em', {}, p), '.')), ...cs)); return { cs, a }; });
-  const capt = [['savat yonida', 'çelak içida'], ['daraxt tagida', 'daraxt yonida'], ['örindiq ustida', 'daraxt tagida'], ['çelak ustida', 'daraxt yonida']];
-  return [...rows.map(r => [r[4], () => { const x = R[rows.indexOf(r)]; x.cs.forEach((c, k) => k === x.a ? c.classList.add('ring', 'good') : c.classList.add('dim')); }]),
-    ['Zukko qadam: 1-qatordagi boşqa rasmlarda muşuk savat yonida va çelak içida.', () => { const x = R[0]; let k = 0; x.cs.forEach((c, i) => { if (i !== x.a) { c.classList.remove('dim'); c.append(h('span', { class: 'cap' }, capt[0][k++])); } }); }]];
+  return [...rows.map((r, ri) => [r[4], () => { const x = R[ri]; x.cs.forEach((c, k) => k === x.a ? c.classList.add('ring', 'good') : c.classList.add('dim')); }]),
+    ['Zukko qadam: 1-qatordagi boşqa rasmlarda muşuk savat yonida va çelak içida.', () => { const x = R[0]; const capt = ['savat yonida', 'çelak içida']; let k = 0; x.cs.forEach((c, i) => { if (i !== x.a) { c.classList.remove('dim'); c.append(h('span', { class: 'cap' }, capt[k++])); } }); }]];
 });
 
-add(21, 'Tipratikanni olmaga olib bor. Yaşil nuqtadan boşlab yöl çiz, devordan ötma!', 'pastga → öngga → tepaga → öngga → pastga → çapga → pastga → öngga', st => {
+add(21, 'Labirint', 'motorika', 2, 'Tipratikanni olmaga olib bor. Yaşil nuqtadan boşlab yöl çiz, devordan ötma!', 'pastga → öngga → tepaga → öngga → pastga → çapga → pastga → öngga', st => {
   const N = 6, C = 70, O = 60;
   const V = ['0,0', '1,1', '2,1', '1,2', '2,2', '2,4', '3,3', '2,0', '3,0', '4,2'], Hh = ['0,1', '0,4', '0,5', '1,0', '1,3', '1,4', '2,2', '3,1', '3,2', '3,3', '3,4', '4,1', '4,2', '4,4', '4,5'];
   const svg = s('svg', { viewBox: `0 0 ${N * C + O * 2} ${N * C + O * 2}` }); svg.append(s('rect', { x: O, y: O, width: N * C, height: N * C, fill: '#F6E6D4' }));
@@ -589,7 +630,7 @@ add(21, 'Tipratikanni olmaga olib bor. Yaşil nuqtadan boşlab yöl çiz, devord
   ];
 });
 
-add(22, 'Katta odam bilan rasmlarga qarab hikoya qil. Hikoya qanday tugaydi? Töğrisini doiraga ol.', 'ikkovi olmalarni birga teradi (2-rasm)', st => {
+add(22, 'Hikoya oxiri', 'nutq', 2, 'Katta odam bilan rasmlarga qarab hikoya qil. Hikoya qanday tugaydi? Töğrisini doiraga ol.', 'ikkovi olmalarni birga teradi — 2-rasm', st => {
   const caps = ['Bek olma teryapti', 'Qoqilib ketdi, savat ağdarildi', 'Qizça yordamga yuguryapti'];
   const fr = ['147', '148', '149'].map((id, i) => h('div', { class: 'card' }, h('span', { class: 'num' }, String(i + 1)), pic(id)));
   const en = ['150', '151', '152'].map(id => card(id));
@@ -602,18 +643,18 @@ add(22, 'Katta odam bilan rasmlarga qarab hikoya qil. Hikoya qanday tugaydi? Tö
   ];
 });
 
-add(23, 'Har qatorda bitta rasm boşqalariga öxşamaydi. Uning ustiga X çiz.', 'sabzi · sariq barg · bargsiz olma · yaşil olmali tipratikan', st => {
+add(23, 'Ortiqçasi', 'diqqat', 2, 'Har qatorda bitta rasm boşqalariga öxşamaydi. Uning ustiga X çiz.', 'sabzi · sariq barg · bargsiz olma · yaşil olmali tipratikan', st => {
   const rows = [[['153', '154', '155', '156'], 3, 'Uçta anor va bitta sabzi — sabzi ortiqça.'], [['157', '158', '159', '160'], 1, 'Uçta qizil barg va bitta sariq — sariq barg boşqaça.'], [['161', '162', '163', '164'], 0, 'Farq kiçik: 1-olmaning bargi yöq!'], [['165', '166', '167', '168'], 2, 'Farq kiçik: 3-tipratikanning ustidagi olma yaşil.']];
   const R = rows.map(([ids], ri) => { const items = h('div', { class: 'items' }); items.style.gridTemplateColumns = 'repeat(4,minmax(0,1fr))'; const cs = ids.map(id => card(id)); items.append(...cs); st.append(h('div', { class: 'irow' }, h('span', { class: 'num' }, String(ri + 1)), items)); return cs; });
   return rows.map(([, a, t], i) => [t, () => R[i][a].classList.add('xmark')]);
 });
 
-add(24, 'Rasmda 4 ta meva va sabzavot ustma-ust çizilgan. Har birini topib, öz rangiga böya.', 'olma, nok, anor, sabzi', st => {
+add(24, 'Ustma-ust rasm', 'diqqat', 2, 'Rasmda 4 ta meva va sabzavot ustma-ust çizilgan. Har birini topib, öz rangiga böya.', 'olma · nok · anor · sabzi', st => {
   const F = fillCanvas(IMG('overlap.png'));
   const wrap = h('div', { class: 'canvas-wrap' }, F.cv); const pk = h('div', { class: 'pick' });
   const cs = [['095', 1], ['099', 1], ['097', 1], ['096', 1], ['100', 0], ['012', 0]].map(([id, ok]) => ({ c: card(id), ok }));
   pk.append(...cs.map(x => x.c)); st.append(wrap, pk);
-  const doFill = (pts, col, idx, lab, lp) => () => F.ready.then(() => { pts.forEach(p => F.fill(p[0], p[1], col)); cs[idx].c.classList.add('good'); tag(wrap, lp[0], lp[1], lab); });
+  const doFill = (pts, col, idx, lab, lp) => () => { cs[idx].c.classList.add('good'); tag(wrap, lp[0], lp[1], lab); F.ready.then(() => pts.forEach(p => F.fill(p[0], p[1], col))); };
   return [
     ['Çapda dumaloq, tepasida bandi va bargi bor — bu olma. Qizilga böyaymiz.', doFill([[21.6, 50.7], [36, 38]], '#E5404A', 0, 'olma', [18, 42])],
     ['Örtada, eng tepada ingiçka bandli şakl — bu nok. Sariqqa böyaymiz.', doFill([[55, 27.8], [55, 52]], '#F5C731', 1, 'nok', [58, 14])],
@@ -623,14 +664,14 @@ add(24, 'Rasmda 4 ta meva va sabzavot ustma-ust çizilgan. Har birini topib, öz
   ];
 });
 
-add(25, 'Ikki rasmni soliştir. Pastki rasmda 4 ta farqni top va doiraga ol.', 'yaşil olma · köylak · savat · muşuk (+ lenta)', st => {
+add(25, 'Farqni top', 'diqqat', 2, 'Ikki rasmni soliştir. Pastki rasmda 4 ta farqni top va doiraga ol.', 'yaşil olma · köylak · savat · muşuk · + kök lenta', st => {
   const top = h('div', { class: 'scene' }, pic('169')), bot = h('div', { class: 'scene' }, pic('170'));
   st.append(h('div', { class: 'spot' }, top, bot));
   const D = [[55.8, 27.6, 'Avval daraxtga qaraymiz: bitta olma yaşil bölib qolgan!'], [64, 72, 'Bolaning köylagi havorangdan yaşilga özgargan.'], [51, 83, 'Savat kök edi — endi jigarrang.'], [80, 81, 'Muşuk sariq-çipor edi — endi kulrang.'], [50.4, 62, 'Zukko qadam: eng kiçik farq — qizning öngdagi lentasi kök rangda!']];
   return D.map(([x, y, t]) => [t, () => { mark(top, x, y); mark(bot, x, y); }]);
 });
 
-add(26, 'Çapdagi rasmga qara. Öngda xuddi şunday çiz: yaşil nuqtadan boşlab, nuqtadan nuqtaga çiziq tort.', 'narvon · uyça · kapalak', st => {
+add(26, 'Nuqtadan nuqtaga', 'motorika', 3, 'Çapdagi rasmga qara. Öngda xuddi şunday çiz: yaşil nuqtadan boşlab, nuqtadan nuqtaga çiziq tort.', 'narvon · uyça · kapalak · + eşik', st => {
   const shapes = [
     ['Narvon', 3, 4, [0, 0], [[0, 0, 0, 3], [0, 1, 2, 1], [0, 2, 2, 2], [2, 0, 2, 3]], 'Narvon: yaşil nuqtadan tög pastga, keyin ikkita poğona va öng tomoni.'],
     ['Uyça', 5, 5, [0, 4], [[0, 4, 4, 4], [4, 4, 4, 2], [4, 2, 2, 0], [2, 0, 0, 2], [0, 2, 0, 4], [0, 2, 4, 2]], 'Uyça: pastki çiziq, öng devor, tom tepaga va pastga, çap devor, keyin şift.'],
@@ -638,19 +679,19 @@ add(26, 'Çapdagi rasmga qara. Öngda xuddi şunday çiz: yaşil nuqtadan boşla
   ];
   const G = 46, M = 30;
   const R = shapes.map(([name, cols, rows, start, segs], si) => {
-    const vb = `0 0 ${(cols - 1) * G + M * 2} ${(rows - 1) * G + M * 2}`, P = (x, y) => [M + x * G, M + y * G];
+    const vb = `0 0 ${(cols - 1) * G + M * 2} ${(rows - 1) * G + M * 2}`, P2 = (x, y) => [M + x * G, M + y * G];
     const ref = s('svg', { viewBox: vb }), user = s('svg', { viewBox: vb }); const lines = s('g'); user.append(lines);
-    segs.forEach(([a, b, c, d]) => { const [x1, y1] = P(a, b), [x2, y2] = P(c, d); ref.append(s('line', { x1, y1, x2, y2, stroke: '#E5505A', 'stroke-width': 5, 'stroke-linecap': 'round' })); });
-    for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) { const [cx, cy] = P(x, y), st0 = start[0] === x && start[1] === y; ref.append(s('circle', { cx, cy, r: st0 ? 9 : 4.5, fill: st0 ? '#2C9A57' : '#2E2723' })); user.append(s('circle', { cx, cy, r: st0 ? 11 : 6, fill: st0 ? '#2C9A57' : '#2E2723' })); }
+    segs.forEach(([a, b, c, d]) => { const [x1, y1] = P2(a, b), [x2, y2] = P2(c, d); ref.append(s('line', { x1, y1, x2, y2, stroke: '#E5505A', 'stroke-width': 5, 'stroke-linecap': 'round' })); });
+    for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) { const [cx, cy] = P2(x, y), st0 = start[0] === x && start[1] === y; ref.append(s('circle', { cx, cy, r: st0 ? 9 : 4.5, fill: st0 ? '#2C9A57' : '#2E2723' })); user.append(s('circle', { cx, cy, r: st0 ? 11 : 6, fill: st0 ? '#2C9A57' : '#2E2723' })); }
     st.append(h('div', { class: 'drow' }, h('span', { class: 'num numtag' }, String(si + 1)), h('figure', {}, ref, h('figcaption', {}, name)), h('div', { class: 'arrow' }), h('div', { class: 'user' }, user)));
-    const draw = (sg, col) => sg.forEach(([a, b, c, d], k) => { const [x1, y1] = P(a, b), [x2, y2] = P(c, d); const l = s('line', { x1, y1, x2, y2, stroke: col, 'stroke-width': 6, 'stroke-linecap': 'round', pathLength: 1, class: 'seg' }); if (!INSTANT) { l.classList.add('anim'); l.style.animationDelay = k * .45 + 's'; } lines.append(l); });
+    const draw = (sg, col) => sg.forEach(([a, b, c, d], k) => { const [x1, y1] = P2(a, b), [x2, y2] = P2(c, d); const l = s('line', { x1, y1, x2, y2, stroke: col, 'stroke-width': 6, 'stroke-linecap': 'round', pathLength: 1, class: 'seg' }); if (!INSTANT) { l.classList.add('anim'); l.style.animationDelay = k * .45 + 's'; } lines.append(l); });
     return { go: () => draw(segs, '#3B62C4'), draw };
   });
   return [...shapes.map((sh, i) => [sh[5], R[i].go]),
     ['Zukko qadam: uyçaga eşik — pastki çiziqdan tepaga, öngga va yana pastga.', () => R[1].draw([[2, 4, 2, 3], [2, 3, 3, 3], [3, 3, 3, 4]], '#E5505A')]];
 });
 
-add(27, 'Boğda oxirgi sinov! Uçta kiçik topşiriqni bajar.', 'barg ortiqça · keyin olma · 4 ta olma', st => {
+add(27, 'Zukko sinov', 'sinov', 3, 'Boğda oxirgi sinov! Uçta kiçik topşiriqni bajar.', 'barg ortiqça · keyin olma keladi · 4 ta olma', st => {
   const r1 = ['172', '173', '174', '175', '176'].map(id => card(id));
   const q = h('div', { class: 'q' }, '?'); const o2 = ['181', '182', '183'].map(id => card(id));
   const circ = h('div', { class: 'circ' }); for (let i = 0; i < 5; i++) circ.append(h('i'));
@@ -662,11 +703,11 @@ add(27, 'Boğda oxirgi sinov! Uçta kiçik topşiriqni bajar.', 'barg ortiqça �
   return [
     ['1: olma, anor, olma, anor — bular meva. Barg meva emas, u ortiqça!', () => r1[2].classList.add('xmark')],
     ['2: olma, nok, olma, nok... keyin yana olma keladi.', () => { o2[1].classList.add('ring', 'good'); q.replaceChildren(pic('182')); }],
-    ['3: noklarni sanamaymiz. Olmalar: 1, 2, 3, 4 — 4 ta doiraçani böyaymiz.', () => { const ap = [0, 2, 3, 5]; ap.forEach((k, i) => { const t = h('span', { class: 'tag round' }, String(i + 1)); t.style.left = '50%'; t.style.top = '8%'; t.style.animationDelay = i * .3 + 's'; r3[k].append(t); }); const on = [...circ.children].slice(0, 4); on.forEach(x => x.classList.add('on')); stagger(on, .3); }]
+    ['3: noklarni sanamaymiz. Olmalar: 1, 2, 3, 4 — 4 ta doiraçani böyaymiz.', () => { [0, 2, 3, 5].forEach((k, i) => { const t = h('span', { class: 'tag round' }, String(i + 1)); t.style.left = '50%'; t.style.top = '8%'; t.style.animationDelay = i * .3 + 's'; r3[k].append(t); }); const on = [...circ.children].slice(0, 4); on.forEach(x => x.classList.add('on')); stagger(on, .3); }]
   ];
 });
 
-add(28, 'Boğni özing xohlagan ranglarga böya.', 'erkin ijod — töğri yoki xato yöq', st => {
+add(28, 'Böyaş', 'ijod', 0, 'Boğni özing xohlagan ranglarga böya.', 'erkin ijod — töğri yoki xato javob yöq', st => {
   const F = fillCanvas(IMG('color.png')); const wrap = h('div', { class: 'canvas-wrap wide' }, F.cv); st.append(wrap);
   const pal = ['#7BC74D', '#E5404A', '#F5C731', '#6FB7E8', '#F28C28', '#B8263A', '#8E3B8F', '#F3A6C0', '#3E9B45', '#C99A6B'];
   let regions = null;
@@ -674,14 +715,14 @@ add(28, 'Boğni özing xohlagan ranglarga böya.', 'erkin ijod — töğri yoki 
     if (regions) return regions;
     const W = F.cv.width, H = F.cv.height, d = F.ctx.getImageData(0, 0, W, H).data, lab = new Int32Array(W * H); const list = []; let id = 0;
     for (let y = 0; y < H; y += 3) for (let x = 0; x < W; x += 3) {
-      const p = y * W + x; if (lab[p] || d[p * 4] < 128) continue; id++; let size = 0, sx = 0, sy = 0; const st2 = [p]; lab[p] = id;
-      while (st2.length) { const q = st2.pop(); size++; const qx = q % W, qy = (q / W) | 0; sx += qx; sy += qy; for (const n of [q - 1, q + 1, q - W, q + W]) { if (n < 0 || n >= W * H || lab[n]) continue; if ((n === q - 1 && qx === 0) || (n === q + 1 && qx === W - 1)) continue; if (d[n * 4] < 128) continue; lab[n] = id; st2.push(n); } }
+      const p = y * W + x; if (lab[p] || d[p * 4] < 128) continue; id++; let size = 0, sy = 0; const st2 = [p]; lab[p] = id;
+      while (st2.length) { const q = st2.pop(); size++; const qx = q % W; sy += (q / W) | 0; for (const n of [q - 1, q + 1, q - W, q + W]) { if (n < 0 || n >= W * H || lab[n]) continue; if ((n === q - 1 && qx === 0) || (n === q + 1 && qx === W - 1)) continue; if (d[n * 4] < 128) continue; lab[n] = id; st2.push(n); } }
       list.push({ x, y, size, cy: sy / size });
     }
     list.sort((a, b) => b.size - a.size); regions = list.slice(1).filter(r => r.size > 120);
     return regions;
   });
-  const paint = (filter, label) => () => find().then(rs => { const sel = rs.filter(filter); if (INSTANT) { sel.forEach((r, i) => F.fill(r.x / F.cv.width * 100, r.y / F.cv.height * 100, pal[(r.x + r.y) % pal.length])); return; } let i = 0; const tok = runTok; const step = () => { if (tok !== runTok) return; for (let k = 0; k < 6 && i < sel.length; k++, i++) { const r = sel[i]; F.fill(r.x / F.cv.width * 100, r.y / F.cv.height * 100, pal[(r.x + r.y) % pal.length]); } if (i < sel.length) requestAnimationFrame(step); }; step(); });
+  const paint = filter => () => { const tok = runTok; find().then(rs => { if (tok !== runTok) return; const sel = rs.filter(filter); let i = 0; const go = () => { if (tok !== runTok) return; for (let k = 0; k < 8 && i < sel.length; k++, i++) { const r = sel[i]; F.fill(r.x / F.cv.width * 100, r.y / F.cv.height * 100, pal[(r.x + r.y) % pal.length]); } if (i < sel.length) requestAnimationFrame(go); }; go(); }); };
   return [
     ['Bu betda töğri yoki xato javob yöq — har kim özi xohlagan rangni tanlaydi. Mana, men tepadan boşlayman...', paint(r => r.cy < (F.cv.height * .45))],
     ['...keyin pastini ham böyayman. Sen boşqa ranglar tanlasang ham böladi!', paint(r => r.cy >= (F.cv.height * .45))],
@@ -689,71 +730,125 @@ add(28, 'Boğni özing xohlagan ranglarga böya.', 'erkin ijod — töğri yoki 
   ];
 });
 
-/* ---------------- player ---------------- */
-const trail = $('#trail'), stage = $('#stage');
-let cur = 0, steps = [], k = 0, playing = false, timer = null;
-const seen = new Set();
+/* ---------------- app shell ---------------- */
+const stage = $('#stage');
+const STAR = '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"/></svg>';
+const STAR_O = '<svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M12 3.5l2.6 5.5 6 .7-4.4 4.2 1.2 6L12 17l-5.4 2.9 1.2-6L3.4 9.7l6-.7z"/></svg>';
 const PLAY = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4l13 8-13 8z"/></svg>';
 const PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>';
+const CHECK = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>';
+let cur = 0, steps = [], k = 0, playing = false, timer = null, filter = 'all';
+const seen = new Set(store.get('seen', []));
 
-// trail map
-(function buildTrail() {
-  const n = P.length, W = 1000, H = 150;
-  const pts = P.map((_, i) => [40 + i * (W - 80) / (n - 1), 82 + 34 * Math.sin(i * .95)]);
-  let d = `M${pts[0][0]} ${pts[0][1]}`; for (let i = 1; i < n; i++) { const [x0, y0] = pts[i - 1], [x1, y1] = pts[i]; const mx = (x0 + x1) / 2; d += ` C${mx} ${y0} ${mx} ${y1} ${x1} ${y1}`; }
-  const svg = s('svg', { viewBox: `0 0 ${W} ${H}`, role: 'group', 'aria-label': 'Betlar yöli' });
-  svg.append(s('path', { d, fill: 'none', stroke: '#C9A67A', 'stroke-width': 30, 'stroke-linecap': 'round', opacity: .55 }), s('path', { d, fill: 'none', stroke: '#E9D3B4', 'stroke-width': 20, 'stroke-linecap': 'round' }));
-  // a few leaves for the garden
-  [[120, 20], [360, 132], [610, 18], [840, 135], [960, 30], [250, 30]].forEach(([x, y], i) => svg.append(s('ellipse', { cx: x, cy: y, rx: 14, ry: 6, fill: i % 2 ? '#F2C230' : '#E5505A', opacity: .55, transform: `rotate(${i * 37} ${x} ${y})` })));
-  P.forEach((p, i) => { const g = s('g', { class: 'stone', tabindex: 0, role: 'button', 'aria-label': p.n + '-bet yechimi', transform: `translate(${pts[i][0]} ${pts[i][1]})` }, s('circle', { class: 'base', r: 20 }), s('text', {}, String(p.n))); g.addEventListener('click', () => open(i)); g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(i); } }); svg.append(g); });
-  const guide = s('g', { id: 'guide' }, s('image', { href: IMG('145'), x: -24, y: -64, width: 48, height: 48 }));
-  svg.append(guide); trail.append(svg); trail._pts = pts; trail._g = guide;
-})();
+// filters
+const fbox = $('#filters');
+const usedSkills = [...new Set(P.map(p => p.skill))];
+[['all', 'Hammasi', null], ...usedSkills.map(sk => [sk, SKILLS[sk][0], SKILLS[sk][1]])].forEach(([key, lab, col]) => {
+  const b = h('button', { class: 'fc', type: 'button', 'aria-pressed': key === 'all' ? 'true' : 'false' }, col ? h('i') : null, lab);
+  if (col) b.style.setProperty('--c', col);
+  b.onclick = () => { filter = key; fbox.querySelectorAll('.fc').forEach(x => x.setAttribute('aria-pressed', x === b)); paintNav(); };
+  fbox.append(b);
+});
+// index
+const nl = $('#navlist');
+const navItems = P.map((p, i) => {
+  const b = h('button', { class: 'ni', type: 'button', onclick: () => open(i) },
+    h('span', { class: 'n' }, String(p.n)),
+    h('span', { style: 'min-width:0' }, h('span', { class: 'nt' }, p.short), h('span', { class: 'ns' }, h('i'), SKILLS[p.skill][0])),
+    h('span', { class: 'seen', html: CHECK, 'aria-label': 'körildi' }));
+  b.style.setProperty('--c', SKILLS[p.skill][1]);
+  b.setAttribute('aria-label', `${p.n}-bet: ${p.short}`);
+  const li = h('li', {}, b); nl.append(li); return { li, b };
+});
+const visible = () => P.map((p, i) => i).filter(i => filter === 'all' || P[i].skill === filter);
+function paintNav() {
+  navItems.forEach(({ li, b }, i) => { li.hidden = !(filter === 'all' || P[i].skill === filter); b.setAttribute('aria-current', i === cur ? 'true' : 'false'); b.classList.toggle('v', seen.has(P[i].n)); });
+  const vis = visible();
+  $('#prevP').disabled = !vis.some(i => i < cur);
+  $('#nextP').disabled = !vis.some(i => i > cur);
+}
+function stepPage(dir) {
+  const vis = visible(); if (!vis.length) return;
+  const next = dir > 0 ? vis.find(i => i > cur) : [...vis].reverse().find(i => i < cur);
+  if (next != null) open(next);
+}
 
 function render(upto) {
   runTok++;
-  const p = P[cur];
   INSTANT = true; stage.classList.add('instant');
-  stage.replaceChildren(); steps = p.setup(stage);
+  stage.replaceChildren(); steps = P[cur].setup(stage);
+  upto = Math.min(upto, steps.length);
   for (let i = 0; i < upto; i++) steps[i][1]();
-  requestAnimationFrame(() => requestAnimationFrame(() => { stage.classList.remove('instant'); }));
-  INSTANT = false; k = upto; ui();
+  INSTANT = false; k = upto;
+  requestAnimationFrame(() => requestAnimationFrame(() => stage.classList.remove('instant')));
+  buildSteps(); ui();
 }
-function step() {
-  if (k >= steps.length) return;
-  steps[k][1](); k++; ui(); const say = $('#say'); say.classList.remove('flash'); void say.offsetWidth; say.classList.add('flash');
+function advance() { if (k >= steps.length) return; steps[k][1](); k++; ui(); }
+function goStep(i) { stop(); if (i === k) return; if (i === k + 1) { advance(); return; } render(Math.max(0, i - 1)); if (i > 0) advance(); }
+
+const sl = $('#sl');
+function buildSteps() {
+  sl.replaceChildren(...steps.map(([t], i) => h('li', {}, h('button', { class: 'sb', type: 'button', onclick: () => goStep(i + 1) }, h('span', { class: 'k' }, String(i + 1)), h('span', {}, t)))));
+  $('#ss').textContent = steps.length + ' qadam';
 }
 function ui() {
-  const p = P[cur];
-  $('#cnt').textContent = k === 0 ? `${p.n}-bet · ${steps.length} qadam` : `${k}-qadam / ${steps.length}`;
-  $('#say').textContent = k === 0 ? 'Salom! Men tipratikanman. «Yechimni körsat»ni bos — birga yeçamiz.' : steps[k - 1][0];
-  $('#back').disabled = k === 0; $('#fwd').disabled = k >= steps.length; $('#all').disabled = k >= steps.length;
-  $('#answer').hidden = k < steps.length;
-  $('#pips').replaceChildren(...steps.map((_, i) => h('i', { class: i < k ? 'on' : '' })));
-  if (k >= steps.length) stop();
-  $('#play').innerHTML = playing ? PAUSE + ' Töxtat' : (k >= steps.length ? PLAY + ' Qaytadan' : (k === 0 ? PLAY + ' Yechimni körsat' : PLAY + ' Davom et'));
+  const N = steps.length;
+  [...sl.querySelectorAll('.sb')].forEach((b, i) => { b.classList.toggle('done', i < k); b.classList.toggle('cur', i === k - 1); });
+  $('#mTask').setAttribute('aria-pressed', k === 0); $('#mSol').setAttribute('aria-pressed', k === N);
+  const lab = playing ? PAUSE + 'Töxtat' : (k === 0 ? PLAY + 'Qadamma-qadam' : k >= N ? PLAY + 'Qaytadan körsat' : PLAY + 'Davom et');
+  $('#play').innerHTML = lab; $('#mPlay').innerHTML = lab;
+  $('#mCnt').textContent = k + ' / ' + N;
+  $('#mPrev').disabled = k === 0; $('#mNext').disabled = k >= N;
 }
 function stop() { playing = false; clearTimeout(timer); }
-function loop() { if (!playing) return; step(); if (k < steps.length) timer = setTimeout(loop, 3000); else { playing = false; ui(); } }
-$('#play').onclick = () => { if (playing) { stop(); ui(); return; } if (k >= steps.length) render(0); playing = true; ui(); loop(); };
-$('#fwd').onclick = () => { stop(); step(); };
-$('#back').onclick = () => { stop(); render(Math.max(0, k - 1)); };
-$('#restart').onclick = () => { stop(); render(0); };
-$('#all').onclick = () => { stop(); render(steps.length); };
+function tick() { if (!playing) return; advance(); if (k < steps.length) timer = setTimeout(tick, 2800); else { playing = false; ui(); } }
+function togglePlay() { if (playing) { stop(); ui(); return; } if (k >= steps.length) render(0); playing = true; ui(); timer = setTimeout(tick, 250); }
+$('#play').onclick = togglePlay; $('#mPlay').onclick = togglePlay;
+$('#mTask').onclick = () => { stop(); render(0); };
+$('#mSol').onclick = () => { stop(); render(steps.length); };
+$('#mPrev').onclick = () => goStep(k - 1);
+$('#mNext').onclick = () => goStep(k + 1);
+$('#prevP').onclick = () => stepPage(-1);
+$('#nextP').onclick = () => stepPage(1);
 
-function open(i, keepHash) {
-  stop(); cur = i; seen.add(i);
+function open(i, fromHash) {
+  stop(); cur = i;
   const p = P[i];
-  $('#pnum').textContent = p.n; $('#ptitle').textContent = p.title; $('#answerText').textContent = p.answer;
-  [...trail.querySelectorAll('.stone')].forEach((g, j) => { g.classList.toggle('cur', j === i); g.classList.toggle('seen', seen.has(j)); });
-  const [x, y] = trail._pts[i]; trail._g.style.transform = `translate(${x}px, ${y}px)`;
-  const sv = trail.querySelector('svg'); const sx = x / 1000 * sv.clientWidth - trail.clientWidth / 2; trail.scrollTo({ left: sx, behavior: 'smooth' });
-  render(0);
-  if (!keepHash) { try { history.replaceState(null, '', '#y' + p.n); } catch { } }
+  seen.add(p.n); store.set('seen', [...seen]);
+  $('#pn').textContent = p.n; $('#title').textContent = p.title;
+  const sk = $('#skill'); sk.replaceChildren(h('i'), SKILLS[p.skill][0]); sk.style.setProperty('--c', SKILLS[p.skill][1]);
+  $('#diff').innerHTML = p.stars ? [1, 2, 3].map(x => x <= p.stars ? STAR : STAR_O).join('') : ''; $('#diff').setAttribute('aria-label', p.stars ? `Qiyinlik ${p.stars} / 3` : '');
+  $('#bet').textContent = `${i + 1} / ${P.length}`;
+  $('#achips').replaceChildren(...p.answer.split(' · ').map(a => h('span', {}, a)));
+  paintNav();
+  navItems[i].b.scrollIntoView({ block: 'nearest', inline: 'center' });
+  render(Infinity); // opens already solved
+  if (!fromHash) { try { history.replaceState(null, '', '#y' + p.n); } catch {} }
 }
 
-// answer key
-P.forEach((p, i) => $('#kgrid').append(h('button', { class: 'kc', type: 'button', onclick: () => { open(i); $('.sheet').scrollIntoView({ behavior: 'smooth' }); setTimeout(() => $('#all').click(), 50); } }, h('span', { class: 'n' }, String(p.n)), h('span', { class: 'a' }, h('b', {}, p.title.split('.')[0] + '.'), p.answer))));
+// keyboard
+document.addEventListener('keydown', e => {
+  if (e.target.closest && e.target.closest('input,textarea')) return;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+    e.preventDefault(); const d = e.key === 'ArrowRight' ? 1 : -1;
+    if (e.shiftKey) stepPage(d); else goStep(Math.max(0, Math.min(steps.length, k + d)));
+  } else if (e.key === ' ' && e.target === document.body) { e.preventDefault(); togglePlay(); }
+});
+// swipe between pages on touch screens
+let sx = null, sy = null;
+stage.addEventListener('pointerdown', e => { if (e.pointerType === 'touch') { sx = e.clientX; sy = e.clientY; } });
+stage.addEventListener('pointerup', e => { if (sx == null) return; const dx = e.clientX - sx, dy = e.clientY - sy; sx = null; if (Math.abs(dx) > 70 && Math.abs(dy) < 50) stepPage(dx < 0 ? 1 : -1); });
+// present mode
+function setPresent(on) {
+  document.body.classList.toggle('present', on);
+  if (on) { try { const r = document.documentElement.requestFullscreen?.(); r && r.catch(() => {}); } catch {} }
+  else if (document.fullscreenElement) { try { document.exitFullscreen(); } catch {} }
+  window.scrollTo({ top: 0 });
+}
+$('#present').onclick = () => setPresent(true);
+$('#exit').onclick = () => setPresent(false);
+document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement && document.body.classList.contains('present')) document.body.classList.remove('present'); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && document.body.classList.contains('present')) setPresent(false); });
 
 const fromHash = () => { const m = /^#y(\d+)$/.exec(location.hash); return m ? P.findIndex(p => p.n === +m[1]) : -1; };
 window.addEventListener('hashchange', () => { const i = fromHash(); if (i >= 0 && i !== cur) open(i, true); });
