@@ -93,7 +93,8 @@ img{max-width:100%;display:block;user-select:none;-webkit-user-drag:none}
 .work{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:14px;align-items:start}
 .steps{position:sticky;top:calc(16px + env(safe-area-inset-top,0px));background:var(--surface);border:1px solid var(--hair);border-radius:20px;padding:14px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:12px}
 .sh{display:flex;gap:10px;align-items:center}
-.sh img{width:42px;height:42px;object-fit:contain;background:#fff;border-radius:12px;padding:2px;transform:scaleX(-1)}
+.sh .duo{display:flex;align-items:flex-end;gap:2px;height:46px;background:#fff;border-radius:12px;padding:2px 6px;flex:0 0 auto}
+.sh img{height:100%;width:auto;object-fit:contain}
 .sh .st{font-weight:700}
 .sh .ss{font-size:.82rem;color:var(--muted)}
 .mode{display:grid;grid-template-columns:1fr 1fr;background:var(--surface-2);border-radius:12px;padding:3px}
@@ -357,7 +358,7 @@ img{max-width:100%;display:block;user-select:none;-webkit-user-drag:none}
     <div class="work">
       <div class="paper" id="stage"></div>
       <aside class="steps" aria-label="Yechim qadamlari">
-        <div class="sh"><img src="img/145.webp" alt=""><div><div class="st">Tipratikan tuşuntiradi</div><div class="ss" id="ss"></div></div></div>
+        <div class="sh"><span class="duo"><img src="img/lola.webp" alt=""><img src="img/bek.webp" alt=""></span><div><div class="st">Bek va Lola tuşuntiradi</div><div class="ss" id="ss"></div></div></div>
         <div class="mode" role="group" aria-label="Körinish">
           <button type="button" id="mTask" aria-pressed="false">Topşiriq</button>
           <button type="button" id="mSol" aria-pressed="true">Yechim</button>

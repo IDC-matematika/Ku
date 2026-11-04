@@ -404,25 +404,30 @@ img{max-width:100%;display:block;user-select:none;-webkit-user-drag:none}
 /* ---------- sound & motion ---------- */
 .ico{display:inline-block}
 .ib.tog[aria-pressed="true"]{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 40%,transparent);color:var(--accent)}
-.mascot{position:fixed;right:max(18px,env(safe-area-inset-right,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:30;pointer-events:none;display:flex;align-items:flex-end;gap:6px}
-.mascot .hog{width:78px;height:78px;transform-origin:50% 100%;animation:breathe 3.2s ease-in-out infinite;filter:drop-shadow(0 4px 6px rgba(0,0,0,.18))}
-.mascot .hog img{width:100%;height:100%;object-fit:contain;transform:scaleX(-1)}
-.mascot .bub{margin-bottom:46px;background:var(--surface);color:var(--fg);border:1px solid var(--hair);box-shadow:var(--shadow);border-radius:16px 16px 4px 16px;padding:7px 12px;font-family:var(--read);font-weight:700;font-size:.98rem;max-width:200px;opacity:0;transform:translateY(6px) scale(.9);transform-origin:100% 100%;transition:opacity .2s,transform .25s cubic-bezier(.2,1.6,.4,1)}
+.mascot{position:fixed;right:max(18px,env(safe-area-inset-right,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:30;pointer-events:none;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.mascot .duo{display:flex;align-items:flex-end;gap:4px}
+.mascot .who{height:96px;transform-origin:50% 100%;filter:drop-shadow(0 4px 6px rgba(0,0,0,.18))}
+.mascot .who img{height:100%;width:auto;object-fit:contain;object-position:bottom}
+.mascot .who.lola{animation:breathe 3.2s ease-in-out infinite}
+.mascot .who.bek{animation:breathe 3.6s ease-in-out infinite .9s}
+.mascot .bub{position:relative;z-index:1;background:var(--surface);color:var(--fg);border:1px solid var(--hair);box-shadow:var(--shadow);border-radius:16px 16px 4px 16px;padding:7px 12px;font-family:var(--read);font-weight:700;font-size:.98rem;max-width:220px;opacity:0;transform:translateY(6px) scale(.9);transform-origin:100% 100%;transition:opacity .2s,transform .25s cubic-bezier(.2,1.6,.4,1)}
+.mascot[data-who="lola"] .bub{align-self:flex-start;border-radius:16px 16px 16px 4px;transform-origin:0 100%}
 .mascot .bub.show{opacity:1;transform:none}
-.mascot.hop .hog{animation:hop .55s cubic-bezier(.3,1.6,.5,1)}
-.mascot.nope .hog{animation:nope .5s ease-in-out}
-.mascot.win .hog{animation:winjump .9s cubic-bezier(.3,1.4,.5,1)}
+.mascot .who.hop{animation:hop .55s cubic-bezier(.3,1.6,.5,1)}
+.mascot .who.nope{animation:nope .5s ease-in-out}
+.mascot .who.win{animation:winjump .9s cubic-bezier(.3,1.4,.5,1)}
+.mascot .who.bek.win{animation-delay:.12s}
 @keyframes breathe{50%{transform:scale(1.03,.97)}}
 @keyframes hop{30%{transform:translateY(-22px) scale(.95,1.06)}60%{transform:translateY(0) scale(1.08,.92)}}
 @keyframes nope{20%{transform:rotate(-9deg)}45%{transform:rotate(8deg)}70%{transform:rotate(-5deg)}}
-@keyframes winjump{25%{transform:translateY(-40px) rotate(-12deg) scale(1.1)}50%{transform:translateY(-40px) rotate(12deg) scale(1.1)}80%{transform:translateY(0) scale(1.1,.9)}}
+@keyframes winjump{25%{transform:translateY(-26px) rotate(-10deg) scale(1.08)}50%{transform:translateY(-26px) rotate(10deg) scale(1.08)}80%{transform:translateY(0) scale(1.1,.9)}}
 .spark{position:fixed;left:0;top:0;width:10px;height:10px;pointer-events:none;z-index:40;animation:spark .7s ease-out forwards}
 @keyframes spark{from{transform:translate(var(--x),var(--y)) scale(1) rotate(0deg)}to{transform:translate(calc(var(--x) + var(--dx)),calc(var(--y) + var(--dy))) scale(.2) rotate(180deg);opacity:0}}
 .flystar{position:fixed;left:-22px;top:-22px;width:44px;height:44px;color:var(--star);z-index:45;pointer-events:none;filter:drop-shadow(0 2px 4px rgba(0,0,0,.25))}
 .flystar svg{width:100%;height:100%;display:block}
 .bump{animation:bump .5s cubic-bezier(.3,1.8,.5,1)}
 @keyframes bump{40%{transform:scale(1.4)}}
-@media (max-width:860px){.mascot{bottom:calc(80px + env(safe-area-inset-bottom,0px));right:max(10px,env(safe-area-inset-right,0px))}.mascot .hog{width:56px;height:56px}.mascot .bub{margin-bottom:30px;font-size:.9rem}}
+@media (max-width:860px){.mascot{bottom:calc(78px + env(safe-area-inset-bottom,0px));right:max(10px,env(safe-area-inset-right,0px))}.mascot .who{height:66px}.mascot .bub{font-size:.9rem;max-width:180px}}
 @media (prefers-reduced-motion:reduce){.spark,.flystar{display:none}}
 </style>
 
@@ -476,7 +481,7 @@ img{max-width:100%;display:block;user-select:none;-webkit-user-drag:none}
   </main>
 </div>
 
-<div class="mascot" id="mascot" aria-hidden="true"><div class="bub" id="bub"></div><div class="hog"><img src="img/145.webp" alt=""></div></div>
+<div class="mascot" id="mascot" aria-hidden="true" data-who="lola"><div class="bub" id="bub"></div><div class="duo"><div class="who lola" id="lola"><img id="lolaImg" src="img/lola.webp" alt=""></div><div class="who bek" id="bek"><img src="img/bek.webp" alt=""></div></div></div>
 
 <nav class="mbar" aria-label="Betlar böyiça yuriş">
   <button class="ib" id="mPrev" type="button" aria-label="Oldingi bet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
@@ -1340,14 +1345,21 @@ let lastPt = null, booted = false;
 document.addEventListener('pointerdown', e => { lastPt = [e.clientX, e.clientY]; }, true);
 document.addEventListener('pointermove', e => { if (e.buttons) lastPt = [e.clientX, e.clientY]; }, true);
 document.addEventListener('keydown', () => { lastPt = null; }, true);
-const mascot = $('#mascot'), bub = $('#bub'); let bubT = null, masT = null;
-const SAY = { yes: ['Zör!', 'Töğri!', 'Ofarin!', 'Barakalla!', 'Juda yaxşi!', 'Ana şunaqa!'], no: ['Yana bir urinib kör', 'Diqqat bilan qara', 'Hechqisi yöq, yana!', 'Öyla-çi...'], win: ['Yulduzça seniki!', 'Zör bölding!', 'Qoyil!'] };
+const mascot = $('#mascot'), bub = $('#bub'), WHO = { lola: $('#lola'), bek: $('#bek') }, lolaImg = $('#lolaImg');
+const LOLA = { happy: IMG('lola'), think: IMG('lola-think') }; new Image().src = LOLA.think;
+let bubT = null, masT = null;
+const SAY = { yes: ['Zör!', 'Töğri!', 'Ofarin!', 'Barakalla!', 'Juda yaxşi!', 'Ana şunaqa!'], no: ['Yana bir urinib kör', 'Diqqat bilan qara', 'Hechqisi yöq, yana!', 'Öyla-çi...', 'Menimça, boşqasi'], win: ['Yulduzça seniki!', 'Zör bölding!', 'Qoyil!', 'Birga uddaladik!'] };
 const pickOne = a => a[Math.floor(Math.random() * a.length)];
 function say(text, ms = 1600) { bub.textContent = text; bub.classList.add('show'); clearTimeout(bubT); bubT = setTimeout(() => bub.classList.remove('show'), ms); }
-function react(kind, text) {
-  mascot.classList.remove('hop', 'nope', 'win'); void mascot.offsetWidth;
-  mascot.classList.add(kind === 'yes' ? 'hop' : kind === 'no' ? 'nope' : 'win');
-  clearTimeout(masT); masT = setTimeout(() => mascot.classList.remove('hop', 'nope', 'win'), 1000);
+function react(kind, text, who) {
+  who = who || (Math.random() < .5 ? 'lola' : 'bek');
+  const cls = kind === 'yes' ? 'hop' : kind === 'no' ? 'nope' : 'win';
+  const who2 = kind === 'win' ? ['lola', 'bek'] : [who];
+  Object.values(WHO).forEach(el => el.classList.remove('hop', 'nope', 'win')); void mascot.offsetWidth;
+  who2.forEach(w => WHO[w].classList.add(cls));
+  lolaImg.src = (kind === 'no' && who === 'lola') ? LOLA.think : LOLA.happy;
+  clearTimeout(masT); masT = setTimeout(() => { Object.values(WHO).forEach(el => el.classList.remove('hop', 'nope', 'win')); lolaImg.src = LOLA.happy; }, kind === 'no' ? 1500 : 1000);
+  mascot.dataset.who = who;
   say(text || pickOne(SAY[kind]), kind === 'win' ? 2400 : 1500);
 }
 function center() { const r = stage.getBoundingClientRect(); return [r.left + r.width / 2, Math.max(80, Math.min(r.top + r.height / 2, innerHeight / 2))]; }
