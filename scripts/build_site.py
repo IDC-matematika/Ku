@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parent.parent
 OUT = Path(sys.argv[1] if len(sys.argv) > 1 else ROOT / "_site").resolve()
 
 # Chapter folders to publish: each holds artifact-format .html pages and an img/ folder.
-CHAPTERS = ["boq-va-mevalar"]
+CHAPTERS = ["boq-va-mevalar", "chalkash-uyga-keldi"]
 
 RESET = (
     "<style>"

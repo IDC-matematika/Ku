@@ -6,7 +6,8 @@ IDC Kids (3–4 yosh) ish daftari asosidagi interaktiv mashqlar va yechimlar.
 
 | Bob | Topshiriqlar | Yechimlar |
 | --- | --- | --- |
-| 1. Boğ va mevalar | [boq-va-mevalar/](https://idc-matematika.github.io/Ku/boq-va-mevalar/) | [yechimlar](https://idc-matematika.github.io/Ku/boq-va-mevalar/yechimlar.html) |
+| 3+ · 1-qism «Chalkash uyga keldi» | [chalkash-uyga-keldi/](https://idc-matematika.github.io/Ku/chalkash-uyga-keldi/) | — |
+| 3–4 yosh · 1-bob «Boğ va mevalar» | [boq-va-mevalar/](https://idc-matematika.github.io/Ku/boq-va-mevalar/) | [yechimlar](https://idc-matematika.github.io/Ku/boq-va-mevalar/yechimlar.html) |
 
 ## Audio («Tinglang» tugmasi)
 
@@ -16,7 +17,7 @@ sarlavhada «Tinglang» tugmasi o'zi paydo bo'ladi; fayl yo'q betlarda tugma ko'
 
 ## Qanday ishlaydi
 
-- `boq-va-mevalar/` — bob sahifalari (Claude Artifact formatida) va rasmlar.
+- `boq-va-mevalar/`, `chalkash-uyga-keldi/` — kitob sahifalari (Claude Artifact formatida) va rasmlar.
 - `site/index.html` — saytning bosh sahifasi.
 - `scripts/build_site.py` — sahifalarni to'liq HTML hujjatga o'rab, `_site/` papkasiga yig'adi.
 - `.github/workflows/pages.yml` — asosiy (default) branchga har push qilinganda saytni yig'ib, GitHub Pages'ga joylaydi.
